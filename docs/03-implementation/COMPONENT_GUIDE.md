@@ -1,536 +1,1169 @@
-# Component Guide - Lightspeed Onboarding Dashboard
+# Component Implementation Guide
 
-## Component Overview
-
-This guide provides detailed information about each custom component in the onboarding dashboard.
+This guide provides detailed implementation instructions and code examples for building the Lightspeed merchant dashboard components.
 
 ---
 
-## 1. CohortSelector (`cohort-selector.tsx`)
+## Table of Contents
 
-**Purpose:** Interactive cohort selection cards for visualizing and choosing merchant segments.
+1. [Getting Started](#getting-started)
+2. [Core Components](#core-components)
+3. [Layout Components](#layout-components)
+4. [Utility Components](#utility-components)
+5. [Hooks & Utilities](#hooks--utilities)
+6. [Integration Guide](#integration-guide)
 
-**Props:**
-```typescript
+---
+
+## Getting Started
+
+### Prerequisites
+
+Ensure you have these dependencies installed:
+
+```json
 {
-  selectedCohort: CohortType;        // Currently selected cohort
-  onSelect?: (cohort: CohortType) => void;  // Selection callback
-  readOnly?: boolean;                // Disable selection (default: false)
+  "dependencies": {
+    "next": "^15.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "framer-motion": "^11.0.0",
+    "lucide-react": "^0.400.0",
+    "@radix-ui/react-*": "latest"
+  }
 }
 ```
 
-**Features:**
-- Three cohort cards (Self-Serve, Assisted, Managed)
-- Color-coded visual identity per cohort
-- Displays GTV range, location count, selling plan, setup plan
-- Hover animation (scale up to 1.03x)
-- Active state with ring indicator
-- Staggered entrance animation (100ms delay per card)
+### File Structure Setup
 
-**Usage:**
-```tsx
-<CohortSelector
-  selectedCohort="assisted"
-  onSelect={handleCohortChange}
-/>
+Create the following directory structure:
+
 ```
+/app
+  /dashboard
+    page.tsx
+    layout.tsx
+    /verify
+      page.tsx
+    /pos-setup
+      page.tsx
+    /hardware
+      page.tsx
+    /payments
+      page.tsx
+    /team
+      page.tsx
+    /import
+      page.tsx
 
-**Visual Elements:**
-- Icon for each cohort (Building2, Users, TrendingUp)
-- Badge showing "Selected" state
-- Card layout with header and detailed info
-- Color-coded backgrounds (10% opacity)
+/components
+  /dashboard
+    sidebar.tsx
+    sidebar-header.tsx
+    sidebar-nav.tsx
+    sidebar-footer.tsx
+    sidebar-mobile.tsx
+    checklist-card.tsx
+    checklist-grid.tsx
+    progress-indicator.tsx
+    hero-section.tsx
+    status-badge.tsx
+    dashboard-layout.tsx
+
+/hooks
+  use-dashboard-data.ts
+  use-sidebar-toggle.ts
+
+/lib
+  dashboard-helpers.ts
+
+/types
+  dashboard.ts
+```
 
 ---
 
-## 2. MerchantInfoPanel (`merchant-info-panel.tsx`)
+## Core Components
 
-**Purpose:** Display comprehensive merchant profile information.
+### 1. Sidebar Component
 
-**Props:**
+**File:** `/components/dashboard/sidebar.tsx`
+
 ```typescript
-{
-  merchant: MerchantProfile;  // Merchant data object
+'use client';
+
+import { cn } from '@/lib/utils';
+import { SidebarHeader } from './sidebar-header';
+import { SidebarNav } from './sidebar-nav';
+import { SidebarFooter } from './sidebar-footer';
+
+interface SidebarProps {
+  className?: string;
+  businessName?: string;
+}
+
+export function Sidebar({ className, businessName = 'Your Business' }: SidebarProps) {
+  return (
+    <aside
+      className={cn(
+        'fixed left-0 top-0 z-40 h-screen w-[280px]',
+        'bg-gray-800 border-r border-gray-700',
+        'flex flex-col',
+        'hidden lg:flex',
+        className
+      )}
+    >
+      <SidebarHeader businessName={businessName} />
+      <SidebarNav />
+      <SidebarFooter />
+    </aside>
+  );
 }
 ```
 
-**Displays:**
-- Business name and merchant ID
-- Cohort badge (color-coded)
-- Annual GTV (formatted currency)
-- Location count
-- Cohort configuration details
-- Selling plan and setup plan
-- Team assignments (AE/IC)
-- Timeline (created date, last activity)
+### 2. Sidebar Header Component
 
-**Features:**
-- Currency formatting with locale support
-- Relative time display ("2h ago", "3d ago")
-- Icons for each data point
-- Sectioned layout with separators
-- Responsive grid for key metrics
+**File:** `/components/dashboard/sidebar-header.tsx`
 
-**Usage:**
-```tsx
-<MerchantInfoPanel merchant={merchantData} />
-```
-
----
-
-## 3. NextActionsPanel (`next-actions-panel.tsx`)
-
-**Purpose:** Context-aware action recommendations and warnings.
-
-**Props:**
 ```typescript
-{
-  currentStep: number;              // Current step ID (1-10)
-  cohort: CohortType;              // Merchant cohort
+'use client';
+
+import Link from 'next/link';
+import { Search } from 'lucide-react';
+
+interface SidebarHeaderProps {
+  businessName: string;
+}
+
+export function SidebarHeader({ businessName }: SidebarHeaderProps) {
+  return (
+    <div className="border-b border-gray-700 p-6">
+      {/* Logo */}
+      <Link href="/dashboard" className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 bg-black rounded flex items-center justify-center">
+          <span className="text-white font-bold text-xl">L</span>
+        </div>
+        <div>
+          <h2 className="text-base font-semibold text-gray-50">Lightspeed</h2>
+          <p className="text-xs text-gray-400">POS & Payments</p>
+        </div>
+      </Link>
+
+      {/* Business Name */}
+      <p className="text-lg font-semibold text-gray-50 mb-4">{businessName}</p>
+
+      {/* Search Bar */}
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+        <input
+          type="search"
+          placeholder="Search..."
+          className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-gray-700 rounded-lg text-sm text-gray-50 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent transition-colors"
+        />
+      </div>
+    </div>
+  );
 }
 ```
 
-**Features:**
-- Current step display with description
-- Cohort-specific action buttons
-  - Self-Serve: "Continue Setup", "View Guide"
-  - Assisted/Managed: "Schedule Call", "Contact Support"
-- Critical warnings based on step position
-  - KYB requirement before hardware purchase
-  - Payout holds until bank verification
-- Next step preview
-- Support team information (for assisted/managed)
+### 3. Sidebar Navigation Component
 
-**Warning Types:**
-- High severity: Red background/border
-- Medium severity: Amber background/border
-- Alert icon with contextual message
+**File:** `/components/dashboard/sidebar-nav.tsx`
 
-**Usage:**
-```tsx
-<NextActionsPanel
-  currentStep={5}
-  cohort="assisted"
-/>
-```
-
----
-
-## 4. ProgressOverview (`progress-overview.tsx`)
-
-**Purpose:** Comprehensive progress tracking and metrics display.
-
-**Props:**
 ```typescript
-{
-  currentStep: number;              // Current step ID
-  completedSteps: number[];         // Array of completed step IDs
+'use client';
+
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { cn } from '@/lib/utils';
+import {
+  Home,
+  Settings,
+  CreditCard,
+  ShoppingCart,
+  DollarSign,
+} from 'lucide-react';
+
+const navItems = [
+  { name: 'Home', href: '/dashboard', icon: Home },
+  { name: 'POS Setup', href: '/dashboard/pos-setup', icon: Settings },
+  { name: 'Hardware & Checkout', href: '/dashboard/hardware', icon: ShoppingCart },
+  { name: 'Bank Setup', href: '/dashboard/payments', icon: DollarSign },
+  { name: 'Settings', href: '/dashboard/settings', icon: Settings },
+];
+
+export function SidebarNav() {
+  const pathname = usePathname();
+
+  return (
+    <nav className="flex-1 px-3 py-4 overflow-y-auto">
+      <ul className="space-y-1">
+        {navItems.map((item) => {
+          const Icon = item.icon;
+          const isActive = pathname === item.href;
+
+          return (
+            <li key={item.href}>
+              <Link
+                href={item.href}
+                className={cn(
+                  'flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all',
+                  isActive
+                    ? 'bg-red-600/10 text-red-600 border-r-4 border-red-600'
+                    : 'text-gray-400 hover:bg-gray-700 hover:text-gray-50'
+                )}
+              >
+                <Icon className="w-5 h-5" />
+                <span>{item.name}</span>
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+    </nav>
+  );
 }
 ```
 
-**Displays:**
-- Overall completion percentage
-- Progress bar (animated)
-- Current stage highlight
-- Step breakdown:
-  - Completed count (green)
-  - In progress count (blue)
-  - Pending count (gray)
-- Stage-by-stage progress meters
+### 4. Sidebar Footer Component
 
-**Features:**
-- Real-time percentage calculation
-- Animated progress bars
-- Color-coded status indicators
-- Stage identification with color dots
-- Responsive layout
+**File:** `/components/dashboard/sidebar-footer.tsx`
 
-**Usage:**
-```tsx
-<ProgressOverview
-  currentStep={5}
-  completedSteps={[1, 2, 3, 4]}
-/>
-```
-
----
-
-## 5. StageHeader (`stage-header.tsx`)
-
-**Purpose:** Visual header for each onboarding stage.
-
-**Props:**
 ```typescript
-{
-  stage: Stage;                     // Stage data object
-  isActive: boolean;                // Is this the current stage?
-  isCompleted: boolean;             // Are all steps completed?
-  index: number;                    // Stage index (for animation delay)
+'use client';
+
+import { HelpCircle, Bell, User } from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+export function SidebarFooter() {
+  return (
+    <div className="border-t border-gray-700 p-5 mt-auto">
+      <div className="flex items-center justify-center gap-3">
+        <button
+          className={cn(
+            'w-10 h-10 flex items-center justify-center rounded-lg',
+            'text-gray-400 hover:bg-gray-700 hover:text-gray-50',
+            'transition-colors focus:outline-none focus:ring-2 focus:ring-red-600'
+          )}
+          aria-label="Help"
+        >
+          <HelpCircle className="w-5 h-5" />
+        </button>
+        <button
+          className={cn(
+            'w-10 h-10 flex items-center justify-center rounded-lg relative',
+            'text-gray-400 hover:bg-gray-700 hover:text-gray-50',
+            'transition-colors focus:outline-none focus:ring-2 focus:ring-red-600'
+          )}
+          aria-label="Notifications"
+        >
+          <Bell className="w-5 h-5" />
+          {/* Notification badge */}
+          <span className="absolute top-1 right-1 w-2 h-2 bg-red-600 rounded-full" />
+        </button>
+        <button
+          className={cn(
+            'w-10 h-10 flex items-center justify-center rounded-lg',
+            'text-gray-400 hover:bg-gray-700 hover:text-gray-50',
+            'transition-colors focus:outline-none focus:ring-2 focus:ring-red-600'
+          )}
+          aria-label="Profile"
+        >
+          <User className="w-5 h-5" />
+        </button>
+      </div>
+    </div>
+  );
 }
 ```
 
-**States:**
-- **Active:** Primary border, shadow, background tint
-- **Completed:** Green border, checkmark icon
-- **Pending:** Gray border, neutral styling
+### 5. Mobile Sidebar Component
 
-**Features:**
-- Numbered icon or checkmark
-- Stage title and description
-- Step range display
-- Entrance animation with staggered delay
-- Active state indicator with layout animation
+**File:** `/components/dashboard/sidebar-mobile.tsx`
 
-**Usage:**
-```tsx
-<StageHeader
-  stage={stageData}
-  isActive={true}
-  isCompleted={false}
-  index={0}
-/>
-```
-
----
-
-## 6. StepCard (`step-card.tsx`)
-
-**Purpose:** Individual step card with status and details.
-
-**Props:**
 ```typescript
-{
-  step: OnboardingStep;             // Step data
-  isActive: boolean;                // Is this step selected?
-  onClick?: () => void;             // Click handler
+'use client';
+
+import { useState } from 'react';
+import { Menu, X } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { Sidebar } from './sidebar';
+import { motion, AnimatePresence } from 'framer-motion';
+
+interface SidebarMobileProps {
+  businessName: string;
+}
+
+export function SidebarMobile({ businessName }: SidebarMobileProps) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <>
+      {/* Mobile Header */}
+      <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 px-4 py-3">
+        <div className="flex items-center justify-between">
+          <button
+            onClick={() => setIsOpen(true)}
+            className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            aria-label="Open menu"
+          >
+            <Menu className="w-6 h-6" />
+          </button>
+
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-black rounded flex items-center justify-center">
+              <span className="text-white font-bold text-sm">L</span>
+            </div>
+            <span className="font-semibold">Lightspeed</span>
+          </div>
+
+          <div className="w-10" /> {/* Spacer for centering */}
+        </div>
+      </header>
+
+      {/* Mobile Sidebar Overlay */}
+      <AnimatePresence>
+        {isOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsOpen(false)}
+              className="lg:hidden fixed inset-0 bg-black/50 z-40"
+            />
+
+            {/* Sidebar Drawer */}
+            <motion.div
+              initial={{ x: -280 }}
+              animate={{ x: 0 }}
+              exit={{ x: -280 }}
+              transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+              className="lg:hidden fixed left-0 top-0 bottom-0 z-50 w-[280px]"
+            >
+              <Sidebar businessName={businessName} className="block" />
+
+              {/* Close Button */}
+              <button
+                onClick={() => setIsOpen(false)}
+                className="absolute top-4 right-4 p-2 rounded-lg bg-gray-700 hover:bg-gray-600 transition-colors"
+                aria-label="Close menu"
+              >
+                <X className="w-5 h-5 text-gray-50" />
+              </button>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    </>
+  );
 }
 ```
 
-**Status Indicators:**
-- **Pending:** Gray circle icon
-- **In Progress:** Blue spinning loader
-- **Completed:** Green checkmark
-- **Blocked:** Red alert icon
+### 6. Checklist Card Component
 
-**Displays:**
-- Step number and badge
-- Step title and description
-- First 3 data collection items
-- "+X more..." for additional items
+**File:** `/components/dashboard/checklist-card.tsx`
 
-**Features:**
-- Hover animation (scale to 1.02x)
-- Active state with ring indicator
-- Status-based color coding
-- Badge with current status
-- Clickable for interaction
-
-**Usage:**
-```tsx
-<StepCard
-  step={stepData}
-  isActive={selectedStep === step.id}
-  onClick={handleStepClick}
-/>
-```
-
----
-
-## 7. OnboardingFlow (`onboarding-flow.tsx`)
-
-**Purpose:** Main flow visualization orchestrating all stages and steps.
-
-**Props:**
 ```typescript
-{
-  currentStep: number;              // Current step ID
-  completedSteps: number[];         // Completed step IDs
-  onStepClick?: (stepId: number) => void;  // Step click handler
+'use client';
+
+import { useRouter } from 'next/navigation';
+import { motion } from 'framer-motion';
+import { cn } from '@/lib/utils';
+import { CheckCircle2, Circle, Clock } from 'lucide-react';
+import { StatusBadge } from './status-badge';
+import { Button } from '@/components/ui/button';
+import type { ChecklistTaskStatus } from '@/types/merchant-onboarding';
+
+interface ChecklistCardProps {
+  title: string;
+  description: string;
+  status: ChecklistTaskStatus | 'disabled';
+  required: boolean;
+  route: string;
+  icon?: React.ReactNode;
+  className?: string;
+}
+
+export function ChecklistCard({
+  title,
+  description,
+  status,
+  required,
+  route,
+  icon,
+  className,
+}: ChecklistCardProps) {
+  const router = useRouter();
+  const isDisabled = status === 'disabled';
+  const isCompleted = status === 'completed';
+  const isInProgress = status === 'in-progress';
+
+  const handleClick = () => {
+    if (!isDisabled && !isCompleted) {
+      router.push(route);
+    }
+  };
+
+  const getStatusIcon = () => {
+    if (isCompleted) return <CheckCircle2 className="w-6 h-6 text-green-600" />;
+    if (isInProgress) return <Clock className="w-6 h-6 text-blue-600" />;
+    return <Circle className="w-6 h-6 text-gray-400" />;
+  };
+
+  const getButtonText = () => {
+    if (isCompleted) return 'Completed';
+    if (isInProgress) return 'Continue';
+    return 'Start';
+  };
+
+  return (
+    <motion.article
+      whileHover={!isDisabled && !isCompleted ? { y: -2 } : {}}
+      className={cn(
+        'bg-white border rounded-lg p-6 shadow-sm transition-all',
+        !isDisabled && !isCompleted && 'hover:shadow-md hover:border-red-600 cursor-pointer',
+        isCompleted && 'bg-gradient-to-r from-green-50 to-white border-green-500',
+        isDisabled && 'opacity-60 cursor-not-allowed',
+        isInProgress && 'border-l-4 border-l-blue-600',
+        className
+      )}
+      aria-labelledby={`task-title-${title}`}
+      aria-describedby={`task-desc-${title}`}
+    >
+      <div className="flex gap-5 items-start">
+        {/* Icon */}
+        <div
+          className={cn(
+            'w-12 h-12 flex items-center justify-center rounded-lg flex-shrink-0',
+            isCompleted ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-600'
+          )}
+        >
+          {icon || getStatusIcon()}
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 min-w-0">
+          {/* Header */}
+          <div className="flex items-start justify-between gap-4 mb-3">
+            <h3
+              id={`task-title-${title}`}
+              className="text-lg font-semibold text-gray-900 leading-tight"
+            >
+              {title}
+            </h3>
+            <StatusBadge required={required} completed={isCompleted} />
+          </div>
+
+          {/* Description */}
+          <p
+            id={`task-desc-${title}`}
+            className="text-base text-gray-600 mb-4 leading-relaxed"
+          >
+            {description}
+          </p>
+
+          {/* Action Button */}
+          <Button
+            onClick={handleClick}
+            disabled={isDisabled || isCompleted}
+            variant={isCompleted ? 'outline' : 'default'}
+            className={cn(
+              'min-h-[44px]',
+              !isCompleted && 'bg-red-600 hover:bg-red-700 text-white'
+            )}
+            aria-label={`${getButtonText()} ${title}`}
+          >
+            {isCompleted && <CheckCircle2 className="w-4 h-4 mr-2" />}
+            {getButtonText()}
+          </Button>
+
+          {/* Already have hardware link (optional) */}
+          {title === 'Hardware Selection' && !isCompleted && (
+            <button className="mt-3 text-sm text-red-600 hover:underline">
+              Already have hardware?
+            </button>
+          )}
+        </div>
+      </div>
+    </motion.article>
+  );
 }
 ```
 
-**Features:**
-- Groups steps by stage
-- Displays stage headers
-- Renders step cards in responsive grid
-- Visual connectors between stages (arrows)
-- Manages selection state
-- Entrance animations:
-  - Stage containers: 200ms delay per stage
-  - Step cards: 100ms delay per step
+### 7. Status Badge Component
 
-**Layout:**
-- Stage header (full width)
-- Step grid (1-3 columns based on screen size)
-- Arrow connector (centered, animated)
-- Repeat for each stage
+**File:** `/components/dashboard/status-badge.tsx`
 
-**Usage:**
-```tsx
-<OnboardingFlow
-  currentStep={5}
-  completedSteps={[1, 2, 3, 4]}
-  onStepClick={handleStepClick}
-/>
-```
-
----
-
-## shadcn/ui Components Used
-
-### Badge (`ui/badge.tsx`)
-- Variants: default, secondary, outline, destructive
-- Used for: cohort labels, status indicators
-
-### Button (`ui/button.tsx`)
-- Variants: default, outline, secondary
-- Sizes: sm, default, lg
-- Used for: action buttons, navigation
-
-### Card (`ui/card.tsx`)
-- Components: Card, CardHeader, CardTitle, CardDescription, CardContent
-- Used for: all major content containers
-
-### Progress (`ui/progress.tsx`)
-- Animated progress bar
-- Customizable color and height
-- Used for: completion tracking
-
-### Separator (`ui/separator.tsx`)
-- Visual divider
-- Used for: section separation in panels
-
-### Tabs (`ui/tabs.tsx`)
-- Components: Tabs, TabsList, TabsTrigger, TabsContent
-- Used for: Dashboard/Full Flow view switcher
-
----
-
-## Animation Specifications
-
-### Entrance Animations
 ```typescript
-// Fade and slide up
-{
-  initial: { opacity: 0, y: 20 },
-  animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.5 }
+'use client';
+
+import { cn } from '@/lib/utils';
+
+interface StatusBadgeProps {
+  required: boolean;
+  completed: boolean;
+  className?: string;
 }
 
-// Scale in
-{
-  initial: { opacity: 0, scale: 0.95 },
-  animate: { opacity: 1, scale: 1 },
-  transition: { duration: 0.2 }
+export function StatusBadge({ required, completed, className }: StatusBadgeProps) {
+  if (completed) {
+    return (
+      <span
+        className={cn(
+          'inline-flex items-center gap-1 px-3 py-1 rounded-md text-xs font-semibold uppercase tracking-wide',
+          'bg-green-100 text-green-700',
+          className
+        )}
+        role="status"
+        aria-label="Task completed"
+      >
+        <span>✓</span>
+        Completed
+      </span>
+    );
+  }
+
+  if (required) {
+    return (
+      <span
+        className={cn(
+          'inline-flex items-center px-3 py-1 rounded-md text-xs font-semibold uppercase tracking-wide',
+          'bg-red-600 text-white',
+          className
+        )}
+        role="status"
+        aria-label="Required task"
+      >
+        Required
+      </span>
+    );
+  }
+
+  return (
+    <span
+      className={cn(
+        'inline-flex items-center px-3 py-1 rounded-md text-xs font-semibold uppercase tracking-wide',
+        'bg-gray-100 text-gray-600 border border-gray-300',
+        className
+      )}
+      role="status"
+      aria-label="Optional task"
+    >
+      Optional
+    </span>
+  );
 }
 ```
 
-### Hover Effects
-```typescript
-// Card hover
-whileHover={{ scale: 1.02 }}
+### 8. Progress Indicator Component
 
-// Button press
-whileTap={{ scale: 0.98 }}
-```
-
-### Staggered Delays
-- Cohort cards: `index * 0.1` (100ms per card)
-- Stages: `index * 0.2` (200ms per stage)
-- Steps: `stageIndex * 0.2 + stepIndex * 0.1`
-
----
-
-## Responsive Breakpoints
-
-Using Tailwind CSS breakpoints:
-
-- **Mobile (default):** 1 column grid
-- **md (768px+):** 2 column grid
-- **lg (1024px+):** 3 column grid (steps), 3-column dashboard layout
-
-### Grid Patterns
-
-**Step Cards:**
-```tsx
-grid-cols-1 md:grid-cols-2 lg:grid-cols-3
-```
-
-**Dashboard Layout:**
-```tsx
-grid-cols-1 lg:grid-cols-3
-// Left column: span 1
-// Right column: lg:col-span-2
-```
-
-**Cohort Selector:**
-```tsx
-grid-cols-1 md:grid-cols-3
-```
-
----
-
-## Color Reference
-
-### Stage Colors
-```
-Qualify Leads:       bg-emerald-500
-Buying Experience:   bg-blue-500
-Guided Setup:        bg-purple-500
-```
-
-### Cohort Colors
-```
-Self-Serve:   bg-blue-500
-Assisted:     bg-purple-500
-Managed:      bg-amber-500
-```
-
-### Status Colors
-```
-Completed:    text-green-600, bg-green-100
-In Progress:  text-blue-600, bg-blue-100
-Pending:      text-gray-400, bg-gray-100
-Blocked:      text-red-600, bg-red-100
-```
-
-### UI Colors
-```
-Primary:      Blue-600
-Secondary:    Purple-600
-Muted:        Gray-500
-Border:       Gray-200
-Background:   Gradient from slate-50 via blue-50 to slate-50
-```
-
----
-
-## Icon Reference
-
-From lucide-react:
-
-- **CheckCircle2:** Completed status
-- **Circle:** Pending status
-- **Loader2:** In-progress status (animated spin)
-- **AlertCircle:** Blocked status, warnings
-- **ArrowRight:** Stage connectors, continue actions
-- **Building2:** Self-serve cohort, business info
-- **Users:** Assisted cohort
-- **TrendingUp:** Managed cohort
-- **DollarSign:** GTV display
-- **MapPin:** Location count
-- **Calendar:** Created date
-- **Activity:** Last activity
-- **Clock:** In-progress indicator
-- **User:** Team assignments
-- **Settings:** Settings button
-- **LayoutDashboard:** Dashboard tab
-- **Workflow:** Full flow tab
-- **Phone:** Call actions
-- **MessageSquare:** Support actions
-
----
-
-## State Management
-
-Currently using React useState for demo purposes:
+**File:** `/components/dashboard/progress-indicator.tsx`
 
 ```typescript
-const [merchant, setMerchant] = useState<MerchantProfile>({
-  id: 'MERCH-2024-001',
-  businessName: 'Riverside Coffee Co.',
-  cohort: 'assisted',
-  currentStep: 5,
-  completedSteps: [1, 2, 3, 4],
-  gtv: 1200000,
-  locationCount: 5,
-  assignedAE: 'Sarah Johnson',
-  assignedIC: 'Mike Chen',
-  createdAt: new Date('2024-01-15'),
-  lastActivity: new Date(),
-});
+'use client';
+
+import { motion } from 'framer-motion';
+import { cn } from '@/lib/utils';
+
+interface ProgressIndicatorProps {
+  completed: number;
+  total: number;
+  percentage: number;
+  className?: string;
+}
+
+export function ProgressIndicator({
+  completed,
+  total,
+  percentage,
+  className,
+}: ProgressIndicatorProps) {
+  return (
+    <div className={cn('mb-8', className)} role="region" aria-label="Onboarding progress">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-3">
+        <p className="text-base font-semibold text-gray-900">
+          {completed} of {total} tasks completed
+        </p>
+        <p className="text-2xl font-bold text-red-600">{percentage}%</p>
+      </div>
+
+      {/* Progress Bar */}
+      <div
+        className="w-full h-2 bg-gray-200 rounded-full overflow-hidden"
+        role="progressbar"
+        aria-valuenow={percentage}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-label={`${percentage}% complete`}
+      >
+        <motion.div
+          className="h-full bg-gradient-to-r from-red-600 to-orange-500 rounded-full"
+          initial={{ width: 0 }}
+          animate={{ width: `${percentage}%` }}
+          transition={{
+            duration: 0.8,
+            ease: [0.4, 0, 0.2, 1],
+          }}
+        />
+      </div>
+    </div>
+  );
+}
 ```
 
-For production, consider:
-- React Query/TanStack Query for server state
-- Zustand for client state
-- Context API for theme/user preferences
+### 9. Hero Section Component
 
----
+**File:** `/components/dashboard/hero-section.tsx`
 
-## Component Dependencies
+```typescript
+'use client';
 
-```
-OnboardingFlow
-  ├── StageHeader
-  └── StepCard
-      └── Card (shadcn)
-          ├── CardHeader
-          ├── CardTitle
-          ├── CardDescription
-          └── CardContent
+import { cn } from '@/lib/utils';
 
-CohortSelector
-  └── Card (shadcn)
-      ├── Badge
-      └── CardHeader/CardContent
+interface HeroSectionProps {
+  title: string;
+  description?: string;
+  className?: string;
+}
 
-MerchantInfoPanel
-  └── Card (shadcn)
-      ├── Badge
-      ├── Separator
-      └── Icons
-
-NextActionsPanel
-  └── Card (shadcn)
-      ├── Button
-      ├── Badge
-      └── Icons
-
-ProgressOverview
-  └── Card (shadcn)
-      ├── Progress
-      └── Badge
+export function HeroSection({ title, description, className }: HeroSectionProps) {
+  return (
+    <section
+      className={cn(
+        'bg-gray-900 text-white rounded-xl p-12 mb-8',
+        className
+      )}
+      aria-label="Dashboard header"
+    >
+      <h1 className="text-4xl font-bold leading-tight mb-3 tracking-tight">
+        {title}
+      </h1>
+      {description && (
+        <p className="text-lg text-gray-400 leading-relaxed max-w-2xl">
+          {description}
+        </p>
+      )}
+    </section>
+  );
+}
 ```
 
+### 10. Checklist Grid Component
+
+**File:** `/components/dashboard/checklist-grid.tsx`
+
+```typescript
+'use client';
+
+import { cn } from '@/lib/utils';
+import { motion } from 'framer-motion';
+
+interface ChecklistGridProps {
+  children: React.ReactNode;
+  className?: string;
+}
+
+const containerVariants = {
+  visible: {
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
+
+export function ChecklistGrid({ children, className }: ChecklistGridProps) {
+  return (
+    <motion.div
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+      className={cn(
+        'grid gap-4 md:grid-cols-1 max-w-4xl',
+        className
+      )}
+      role="list"
+      aria-label="Onboarding checklist"
+    >
+      {children}
+    </motion.div>
+  );
+}
+```
+
 ---
 
-## Testing Considerations
+## Layout Components
 
-For future testing implementation:
+### Dashboard Layout Component
 
-1. **Unit Tests**
-   - Component rendering
-   - Props validation
-   - State changes
+**File:** `/components/dashboard/dashboard-layout.tsx`
 
-2. **Integration Tests**
-   - User interactions
-   - Navigation flows
-   - Data updates
+```typescript
+'use client';
 
-3. **Visual Regression Tests**
-   - Screenshot comparison
-   - Animation playback
-   - Responsive layouts
+import { Sidebar } from './sidebar';
+import { SidebarMobile } from './sidebar-mobile';
+import { cn } from '@/lib/utils';
 
-4. **Accessibility Tests**
-   - ARIA labels
-   - Keyboard navigation
-   - Screen reader compatibility
+interface DashboardLayoutProps {
+  children: React.ReactNode;
+  businessName?: string;
+  className?: string;
+}
+
+export function DashboardLayout({
+  children,
+  businessName = 'Your Business',
+  className,
+}: DashboardLayoutProps) {
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Desktop Sidebar */}
+      <Sidebar businessName={businessName} />
+
+      {/* Mobile Sidebar */}
+      <SidebarMobile businessName={businessName} />
+
+      {/* Main Content */}
+      <main
+        id="main-content"
+        className={cn(
+          'lg:pl-[280px] pt-16 lg:pt-0',
+          'min-h-screen',
+          className
+        )}
+      >
+        <div className="container mx-auto px-4 py-8 lg:px-8 lg:py-12 max-w-6xl">
+          {children}
+        </div>
+      </main>
+    </div>
+  );
+}
+```
 
 ---
 
-## Performance Notes
+## Hooks & Utilities
 
-- All components use React.memo candidates for optimization
-- Heavy computations (progress calculation) can be memoized
-- Animation uses Framer Motion's layout optimization
-- Tailwind CSS purges unused styles in production
-- Images and icons are optimized via next/image and SVG
+### Dashboard Data Hook
+
+**File:** `/hooks/use-dashboard-data.ts`
+
+```typescript
+'use client';
+
+import { useState, useEffect } from 'react';
+import type { ChecklistTask, ChecklistTaskStatus } from '@/types/merchant-onboarding';
+import { Building2, Smartphone, ShoppingCart, CreditCard, Users, Database } from 'lucide-react';
+
+export function useDashboardData() {
+  const [tasks, setTasks] = useState<ChecklistTask[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [businessName, setBusinessName] = useState('Your Business');
+
+  useEffect(() => {
+    const loadDashboard = async () => {
+      try {
+        // Load merchant data from localStorage or API
+        const prequalData = localStorage.getItem('prequalificationData');
+
+        if (prequalData) {
+          const data = JSON.parse(prequalData);
+          setBusinessName(data.businessName || 'Your Business');
+        }
+
+        // Load existing merchant state
+        const merchantEmail = localStorage.getItem('merchantEmail');
+        let merchantState = null;
+
+        if (merchantEmail) {
+          const response = await fetch(`/api/merchants/${merchantEmail}`);
+          if (response.ok) {
+            merchantState = await response.json();
+          }
+        }
+
+        // Construct checklist based on completion state
+        const checklistTasks: ChecklistTask[] = [
+          {
+            id: 'business-verification',
+            title: 'Business Verification',
+            description: 'Complete KYB verification to accept payments',
+            status: determineStatus(merchantState, 'kybStatus'),
+            required: true,
+            route: '/dashboard/verify',
+            icon: 'Building2',
+          },
+          {
+            id: 'pos-configuration',
+            title: 'POS Configuration',
+            description: 'Set up your point of sale system and locations',
+            status: determineStatus(merchantState, 'posSetupData'),
+            required: true,
+            route: '/dashboard/pos-setup',
+            icon: 'Smartphone',
+          },
+          {
+            id: 'hardware-selection',
+            title: 'Hardware Selection',
+            description: 'Choose and order your POS hardware',
+            status: determineStatus(merchantState, 'checkoutData', 'kybStatus'),
+            required: true,
+            route: '/dashboard/hardware',
+            icon: 'ShoppingCart',
+          },
+          {
+            id: 'payment-setup',
+            title: 'Payment Setup',
+            description: 'Configure payment processing and bank account',
+            status: determineStatus(merchantState, 'bankAccountData', 'kybStatus'),
+            required: true,
+            route: '/dashboard/payments',
+            icon: 'CreditCard',
+          },
+          {
+            id: 'team-setup',
+            title: 'Team Setup',
+            description: 'Add team members and set permissions',
+            status: 'not-started' as ChecklistTaskStatus,
+            required: false,
+            route: '/dashboard/team',
+            icon: 'Users',
+          },
+          {
+            id: 'import-data',
+            title: 'Import Data',
+            description: 'Import products, customers, and inventory',
+            status: determineStatus(merchantState, 'dataImported', 'posSetupData'),
+            required: false,
+            route: '/dashboard/import',
+            icon: 'Database',
+          },
+        ];
+
+        setTasks(checklistTasks);
+      } catch (error) {
+        console.error('Failed to load dashboard data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadDashboard();
+  }, []);
+
+  const progress = {
+    completed: tasks.filter((t) => t.status === 'completed').length,
+    total: tasks.filter((t) => t.required).length,
+    percentage: Math.round(
+      (tasks.filter((t) => t.status === 'completed' && t.required).length /
+        tasks.filter((t) => t.required).length) *
+        100
+    ),
+  };
+
+  return { tasks, progress, isLoading, businessName };
+}
+
+function determineStatus(
+  merchantState: any,
+  field: string,
+  dependency?: string
+): ChecklistTaskStatus | 'disabled' {
+  if (!merchantState) return 'not-started';
+
+  // Check dependency first
+  if (dependency) {
+    if (dependency === 'kybStatus' && merchantState.kybStatus !== 'approved') {
+      return 'disabled';
+    }
+    if (dependency === 'posSetupData' && !merchantState.posSetupData) {
+      return 'disabled';
+    }
+  }
+
+  // Check field status
+  if (field === 'kybStatus' || field === 'kycStatus') {
+    if (merchantState[field] === 'approved') return 'completed';
+    if (merchantState[field] === 'pending') return 'in-progress';
+    return 'not-started';
+  }
+
+  // Check if data exists
+  if (merchantState[field] && Object.keys(merchantState[field]).length > 0) {
+    return 'completed';
+  }
+
+  return 'not-started';
+}
+```
+
+### Dashboard Helpers
+
+**File:** `/lib/dashboard-helpers.ts`
+
+```typescript
+import type { ChecklistTask } from '@/types/merchant-onboarding';
+
+export function calculateProgress(tasks: ChecklistTask[]) {
+  const requiredTasks = tasks.filter((t) => t.required);
+  const completedRequired = requiredTasks.filter((t) => t.status === 'completed');
+
+  return {
+    completed: completedRequired.length,
+    total: requiredTasks.length,
+    percentage: Math.round((completedRequired.length / requiredTasks.length) * 100),
+  };
+}
+
+export function getNextTask(tasks: ChecklistTask[]): ChecklistTask | null {
+  const incompleteTasks = tasks.filter(
+    (t) => t.status !== 'completed' && t.status !== 'disabled'
+  );
+
+  if (incompleteTasks.length === 0) return null;
+
+  // Prioritize required tasks
+  const nextRequired = incompleteTasks.find((t) => t.required);
+  return nextRequired || incompleteTasks[0];
+}
+
+export function canStartTask(task: ChecklistTask, tasks: ChecklistTask[]): boolean {
+  if (task.status === 'disabled') return false;
+  if (task.status === 'completed') return false;
+
+  // Check dependencies (example: hardware requires business verification)
+  if (task.id === 'hardware-selection' || task.id === 'payment-setup') {
+    const businessVerification = tasks.find((t) => t.id === 'business-verification');
+    if (businessVerification && businessVerification.status !== 'completed') {
+      return false;
+    }
+  }
+
+  if (task.id === 'import-data') {
+    const posSetup = tasks.find((t) => t.id === 'pos-configuration');
+    if (posSetup && posSetup.status !== 'completed') {
+      return false;
+    }
+  }
+
+  return true;
+}
+```
 
 ---
 
-**Last Updated:** October 9, 2025
-**Framework:** Next.js 15 with App Router
-**Component Library:** shadcn/ui + custom components
+## Integration Guide
+
+### Main Dashboard Page
+
+**File:** `/app/dashboard/page.tsx`
+
+```typescript
+'use client';
+
+import { DashboardLayout } from '@/components/dashboard/dashboard-layout';
+import { HeroSection } from '@/components/dashboard/hero-section';
+import { ProgressIndicator } from '@/components/dashboard/progress-indicator';
+import { ChecklistGrid } from '@/components/dashboard/checklist-grid';
+import { ChecklistCard } from '@/components/dashboard/checklist-card';
+import { useDashboardData } from '@/hooks/use-dashboard-data';
+import { motion } from 'framer-motion';
+import * as Icons from 'lucide-react';
+
+export default function DashboardPage() {
+  const { tasks, progress, isLoading, businessName } = useDashboardData();
+
+  if (isLoading) {
+    return (
+      <DashboardLayout businessName={businessName}>
+        <DashboardSkeleton />
+      </DashboardLayout>
+    );
+  }
+
+  return (
+    <DashboardLayout businessName={businessName}>
+      <HeroSection
+        title="Get set up to check out customers"
+        description="Complete these tasks to start accepting payments and managing your business with Lightspeed."
+      />
+
+      <ProgressIndicator
+        completed={progress.completed}
+        total={progress.total}
+        percentage={progress.percentage}
+      />
+
+      <ChecklistGrid>
+        {tasks.map((task, index) => {
+          // @ts-ignore - Dynamic icon lookup
+          const IconComponent = Icons[task.icon];
+
+          return (
+            <motion.div
+              key={task.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
+            >
+              <ChecklistCard
+                title={task.title}
+                description={task.description}
+                status={task.status}
+                required={task.required}
+                route={task.route}
+                icon={IconComponent ? <IconComponent className="w-6 h-6" /> : undefined}
+              />
+            </motion.div>
+          );
+        })}
+      </ChecklistGrid>
+    </DashboardLayout>
+  );
+}
+
+function DashboardSkeleton() {
+  return (
+    <div className="space-y-8 animate-pulse">
+      {/* Hero Skeleton */}
+      <div className="bg-gray-900 rounded-xl p-12">
+        <div className="h-10 bg-gray-800 rounded w-2/3 mb-3" />
+        <div className="h-6 bg-gray-800 rounded w-1/2" />
+      </div>
+
+      {/* Progress Skeleton */}
+      <div>
+        <div className="flex justify-between mb-3">
+          <div className="h-6 bg-gray-300 rounded w-40" />
+          <div className="h-8 bg-gray-300 rounded w-16" />
+        </div>
+        <div className="h-2 bg-gray-300 rounded-full" />
+      </div>
+
+      {/* Cards Skeleton */}
+      <div className="space-y-4">
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} className="bg-white border rounded-lg p-6">
+            <div className="flex gap-5">
+              <div className="w-12 h-12 bg-gray-200 rounded-lg" />
+              <div className="flex-1 space-y-3">
+                <div className="h-6 bg-gray-200 rounded w-1/3" />
+                <div className="h-4 bg-gray-200 rounded w-2/3" />
+                <div className="h-10 bg-gray-200 rounded w-24" />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+```
+
+### Dashboard Layout Wrapper
+
+**File:** `/app/dashboard/layout.tsx`
+
+```typescript
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Dashboard | Lightspeed Onboarding',
+  description: 'Complete your onboarding tasks to start using Lightspeed POS and Payments',
+};
+
+export default function DashboardRootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return <>{children}</>;
+}
+```
+
+### Update Get Started Redirect
+
+The `/app/get-started/page.tsx` file has already been updated to redirect to `/dashboard` instead of `/onboarding`. Verify this line exists:
+
+```typescript
+// Line 49 in /app/get-started/page.tsx
+router.push('/dashboard');
+```
+
+---
+
+## Next Steps
+
+1. **Install dependencies** (if not already installed):
+   ```bash
+   npm install lucide-react framer-motion
+   ```
+
+2. **Create all component files** following the structure above
+
+3. **Test each component individually** before integration
+
+4. **Implement responsive behavior** and test on multiple devices
+
+5. **Add accessibility features** and test with screen readers
+
+6. **Performance optimization**: Lazy load components, optimize images
+
+7. **Error handling**: Add error boundaries and loading states
+
+8. **Analytics**: Track user interactions and task completion
+
+---
+
+## Troubleshooting
+
+### Common Issues
+
+**Issue: Sidebar not showing on desktop**
+- Solution: Ensure `lg:flex` class is applied to sidebar
+- Check z-index conflicts
+
+**Issue: Mobile sidebar not sliding in**
+- Solution: Verify Framer Motion is installed
+- Check for conflicting CSS transitions
+
+**Issue: Progress bar not animating**
+- Solution: Ensure Framer Motion is properly configured
+- Check percentage value is valid (0-100)
+
+**Issue: Cards not routing correctly**
+- Solution: Verify routes exist in `/app/dashboard/`
+- Check Next.js App Router configuration
+
+---
+
+## Performance Tips
+
+1. **Lazy load task pages**: Use Next.js dynamic imports
+2. **Optimize icons**: Use `lucide-react` tree-shaking
+3. **Reduce animation complexity** on low-end devices
+4. **Cache merchant data** appropriately
+5. **Use React.memo** for checklist cards to prevent unnecessary re-renders
+
+---
+
+## Accessibility Checklist
+
+- [ ] All interactive elements have proper ARIA labels
+- [ ] Keyboard navigation works throughout
+- [ ] Focus indicators are visible
+- [ ] Color contrast meets WCAG AA standards
+- [ ] Screen reader announcements are appropriate
+- [ ] Touch targets are at least 44x44px
+- [ ] Skip to main content link exists
+- [ ] Proper heading hierarchy (h1 → h2 → h3)
+
+---
+
+**Version:** 1.0
+**Last Updated:** 2025-10-10

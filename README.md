@@ -175,11 +175,18 @@ npm start
 
 Comprehensive documentation is available in the `/docs` directory:
 
-- **[Documentation Index](./docs/INDEX.md)** - Complete guide to all documentation
-- **[Quick Start](./docs/00-getting-started/QUICK_START.md)** - Developer setup guide
-- **[Product Requirements](./docs/01-product/merchant_onboarding_prd_revised.md)** - Full PRD
-- **[Design Specifications](./docs/02-design/DESIGN_SPECIFICATIONS.md)** - Complete design specs
-- **[Component Guide](./docs/03-implementation/COMPONENT_IMPLEMENTATION_GUIDE.md)** - Implementation details
+**📖 [Start Here: Documentation Hub](./docs/README.md)**
+
+### Quick Links
+
+- **[Quick Start Guide](./docs/00-getting-started/QUICK_START.md)** - Get up and running
+- **[Product Requirements](./docs/01-product/PRODUCT_REQUIREMENTS.md)** - What we're building
+- **[Design Specifications](./docs/02-design/DESIGN_SPECIFICATIONS.md)** - Complete UX/UI specs
+- **[Component Guide](./docs/03-implementation/COMPONENT_GUIDE.md)** - Implementation details
+- **[Architecture](./docs/03-implementation/ARCHITECTURE.md)** - Technical architecture
+- **[Design System](./docs/04-reference/DESIGN_SYSTEM.md)** - Colors, typography, components
+
+**Total Documentation**: 9 lean files focused on current product state
 
 ## License
 

@@ -1,32 +1,282 @@
-# Cohort-Based Merchant Onboarding - Documentation
+# Lightspeed Merchant Onboarding Documentation
 
-This directory contains comprehensive documentation for all phases of the merchant onboarding system implementation.
+Complete documentation for the Lightspeed merchant onboarding application.
+
+---
+
+## Quick Access
+
+**New to the project?** → Start with [Quick Start Guide](00-getting-started/QUICK_START.md)
+
+**Understanding the product?** → Read [Product Requirements](01-product/PRODUCT_REQUIREMENTS.md)
+
+**Implementing features?** → Reference:
+- [Design Specifications](02-design/DESIGN_SPECIFICATIONS.md)
+- [Component Guide](03-implementation/COMPONENT_GUIDE.md)
+- [Architecture](03-implementation/ARCHITECTURE.md)
+
+**Need UI copy?** → [UI Copy Reference](02-design/UI_COPY.md)
+
+**Design system details?** → [Design System](04-reference/DESIGN_SYSTEM.md)
+
+---
+
+## Product Overview
+
+### What Is This?
+
+A **4-step merchant onboarding flow** that guides businesses through signup, configuration, purchase, and activation for Lightspeed POS and Payments.
+
+### The Four Steps
+
+1. **Sign Up & Tell Us About Your Business**
+   - Create account
+   - Provide business details
+   - Get cohort assignment
+
+2. **Set Up Your POS & Payments**
+   - Configure locations and registers
+   - Select hardware bundles
+   - Set up payment processing
+
+3. **Complete Purchase & Verification**
+   - Review quote and pricing
+   - Enter payment details
+   - Complete identity verification (KYC)
+
+4. **Get Everything Ready**
+   - Connect bank account for payouts
+   - Activate payments per location
+   - Final configuration
+
+### Merchant Cohorts
+
+The system automatically assigns merchants to one of three cohorts based on business size:
+
+| Cohort | Revenue | Locations | Experience |
+|--------|---------|-----------|------------|
+| **Self-Serve** | <$500K | 1-3 | Fully automated flow |
+| **Assisted** | $500K-$2M | 3-10 | Sales-guided with self-checkout |
+| **Managed** | $2M+ | 10+ | White-glove implementation |
+
+---
+
+## Tech Stack
+
+**Framework**: Next.js 15.5.4 (App Router, Turbopack)
+**Language**: TypeScript 5+
+**Styling**: Tailwind CSS 4
+**Components**: shadcn/ui (Radix UI primitives)
+**Animations**: Framer Motion 12
+**Icons**: Lucide React
+
+---
 
 ## Documentation Structure
 
-### Phase 1: Foundation & Architecture (Weeks 1-4)
-- **`phase-1/architecture/`** - System architecture, data models, integration patterns
-- **`phase-1/api-design/`** - API specifications and contracts
-- **`phase-1/product/`** - Product decisions, cohort thresholds, open question resolutions
-- **`phase-1/design/`** - UX/UI designs, wireframes, design system
+### 00-getting-started/
+Developer onboarding and setup instructions.
 
-### Phase 2: Core Services Development (Weeks 5-10)
-- **`phase-2/`** - Lead profiling engine, routing logic, progress tracking, data sync layer
+**Files:**
+- `QUICK_START.md` - Get the app running locally
 
-### Phase 3: Self-Serve Path (Weeks 11-16)
-- **`phase-3/`** - Unified dashboard, KYB/KYC integration, data import wizard, hardware guides
+### 01-product/
+Product requirements and business context.
 
-### Phase 4: Assisted & Managed Paths (Weeks 17-22)
-- **`phase-4/`** - AE quote builder, IC scheduling, admin dashboards, communication tracking
+**Files:**
+- `PRODUCT_REQUIREMENTS.md` - Complete PRD with 4-step flow definition
 
-### Phase 5: Intelligence & Optimization (Weeks 23-28)
-- **`phase-5/`** - Drop-off detection, A/B testing, analytics dashboard
+### 02-design/
+Design specifications, user flows, and UI copy.
 
-## Current Status
+**Files:**
+- `DESIGN_SPECIFICATIONS.md` - Complete UX/UI specifications for all 4 steps
+- `USER_FLOWS.md` - Visual flow diagrams
+- `UI_COPY.md` - All interface copy and messaging
 
-**Active Phase:** Phase 1 - Foundation & Architecture
-**Last Updated:** October 2025
+### 03-implementation/
+Technical implementation guides and architecture.
 
-## Agent Deployments
+**Files:**
+- `COMPONENT_GUIDE.md` - Component implementation details
+- `ARCHITECTURE.md` - Technical architecture and data flow
 
-Each phase leverages specialized Claude Code agents for specific tasks. See individual phase directories for agent outputs and deliverables.
+### 04-reference/
+Reusable design system reference.
+
+**Files:**
+- `DESIGN_SYSTEM.md` - Colors, typography, spacing, components
+
+---
+
+## Common Tasks
+
+### I want to...
+
+**Get the application running**
+```bash
+cd /Users/mike.mcmillan/onboarding
+npm install
+npm run dev
+```
+See [Quick Start](00-getting-started/QUICK_START.md) for details.
+
+**Understand what the product does**
+→ Read [Product Requirements](01-product/PRODUCT_REQUIREMENTS.md)
+
+**See how users move through the flow**
+→ Review [User Flows](02-design/USER_FLOWS.md)
+
+**Implement a new component**
+→ Follow [Component Guide](03-implementation/COMPONENT_GUIDE.md)
+
+**Update interface copy**
+→ Edit [UI Copy](02-design/UI_COPY.md)
+
+**Find color codes or spacing values**
+→ Check [Design System](04-reference/DESIGN_SYSTEM.md)
+
+**Understand the technical architecture**
+→ Review [Architecture](03-implementation/ARCHITECTURE.md)
+
+---
+
+## Key Features
+
+### Merchant Experience
+- **Marketing landing page** - Public-facing product information
+- **4-step signup flow** - Streamlined onboarding journey
+- **Merchant dashboard** - Post-signup hub with 7 sections
+- **Cohort-specific routing** - Different experiences by business size
+
+### Admin Experience
+- **Operations dashboard** - Monitor all merchant progress
+- **Merchant detail views** - Complete merchant profiles
+- **Cohort filtering** - View by self-serve, assisted, or managed
+- **Progress tracking** - See completion status across all steps
+
+### Technical Highlights
+- **Responsive design** - Mobile-first, works on all devices
+- **Type-safe** - Full TypeScript coverage
+- **Accessible** - WCAG AA compliant
+- **Animated** - Smooth transitions with Framer Motion
+- **Mock data layer** - Prototype-ready with realistic data
+
+---
+
+## Application Structure
+
+```
+/
+├── app/                    # Next.js pages
+│   ├── page.tsx           # Marketing landing page
+│   ├── get-started/       # 4-step signup flow
+│   ├── dashboard/         # Merchant dashboard (7 pages)
+│   └── admin/             # Operations panel
+│
+├── components/
+│   ├── ui/                # shadcn/ui base components
+│   ├── dashboard/         # Dashboard-specific components
+│   ├── merchant/          # Merchant flow components
+│   ├── admin/             # Admin panel components
+│   └── get-started/       # Get started flow components
+│
+├── lib/
+│   ├── onboarding-data.ts # Data models and configurations
+│   └── utils.ts           # Utility functions
+│
+├── data/
+│   └── mock-merchants.ts  # Mock merchant data for admin panel
+│
+└── types/
+    └── onboarding.ts      # TypeScript type definitions
+```
+
+---
+
+## Documentation Philosophy
+
+### Current State Only
+
+Documentation describes **what exists**, not historical decisions or planning phases.
+
+**We document:**
+- ✅ How the product works today
+- ✅ How to build features
+- ✅ Why non-obvious decisions were made
+
+**We don't document:**
+- ❌ Historical planning phases
+- ❌ Features that were considered but not built
+- ❌ Multiple versions of the same information
+
+### Single Source of Truth
+
+Each topic has **one authoritative document**:
+- Product requirements → `PRODUCT_REQUIREMENTS.md`
+- Design specifications → `DESIGN_SPECIFICATIONS.md`
+- Component implementation → `COMPONENT_GUIDE.md`
+- Technical architecture → `ARCHITECTURE.md`
+
+**Never duplicate information across files.**
+
+---
+
+## Maintenance
+
+### When to Update Documentation
+
+**Always update when:**
+- Changing product requirements
+- Modifying user flows
+- Updating UI copy
+- Adding or changing components
+- Modifying architecture
+
+### How to Update
+
+1. **Find the right document** - Use this README as navigation
+2. **Update in place** - Edit the single source of truth
+3. **Keep it current** - Remove outdated information
+4. **Test examples** - Ensure code examples work
+
+### Documentation Standards
+
+**File naming:**
+- Use clear, descriptive names (no "revised", "v2", "summary" suffixes)
+- ALL_CAPS for major documents
+- Keep names concise
+
+**Content rules:**
+- Write in present tense ("The product has 4 steps")
+- Be specific and actionable
+- Include code examples where helpful
+- Remove outdated content immediately
+
+---
+
+## Getting Help
+
+**Application not running?** → See [Quick Start troubleshooting](00-getting-started/QUICK_START.md#troubleshooting)
+
+**Design questions?** → Reference [Design Specifications](02-design/DESIGN_SPECIFICATIONS.md)
+
+**Implementation questions?** → Check [Component Guide](03-implementation/COMPONENT_GUIDE.md)
+
+**Architecture questions?** → Review [Architecture](03-implementation/ARCHITECTURE.md)
+
+**Documentation unclear?** → Open an issue or update the doc directly
+
+---
+
+## Related Resources
+
+**Live Application**: http://localhost:3000 (development)
+**Source Code**: `/app`, `/components`, `/lib`
+**Project README**: [../README.md](../README.md)
+
+---
+
+**Last Updated**: October 2025
+**Total Documentation Files**: 8
+**Documentation Coverage**: Current product state only
