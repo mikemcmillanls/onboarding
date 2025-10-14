@@ -1,36 +1,169 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Lightspeed Onboarding Dashboard
+
+A modern, interactive visualization of the cohort-based merchant onboarding system for X-Series and Lightspeed Payments.
+
+## Overview
+
+This application provides a comprehensive dashboard for visualizing and managing the 10-step merchant onboarding journey, organized into three distinct stages:
+
+### Three-Stage Flow
+
+1. **Qualify Leads** (Steps 1-3)
+   - Lead capture
+   - Account creation & profiling
+   - KYB qualification
+
+2. **Buying Experience** (Steps 4-6)
+   - Software selection
+   - Hardware selection
+   - Purchase & payment
+
+3. **Guided Setup** (Steps 7-10)
+   - KYC & payments activation
+   - Data import
+   - Bank account connection
+   - Hardware setup & go-live
+
+### Merchant Cohorts
+
+- **Self-Serve**: <$500K GTV, 1-3 locations
+- **Assisted**: $500K-$2M GTV, 3-10 locations
+- **Managed**: $2M+ GTV, 10+ locations
+
+## Features
+
+- Interactive onboarding flow visualization
+- Real-time progress tracking
+- Cohort-specific experience paths
+- Stage and step completion indicators
+- Merchant profile dashboard
+- Next actions panel with critical warnings
+- Smooth animations and transitions
+- Fully responsive design
+
+## Tech Stack
+
+- **Framework**: Next.js 15 (App Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **Components**: shadcn/ui
+- **Animations**: Framer Motion
+- **Icons**: Lucide React
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
+- Node.js 18+ and npm
+
+### Installation
+
+1. Install dependencies:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Run the development server:
+```bash
+npm run dev
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. Open [http://localhost:3000](http://localhost:3000) in your browser
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Project Structure
 
-## Learn More
+```
+/
+├── app/
+│   ├── layout.tsx          # Root layout with metadata
+│   ├── page.tsx            # Landing page
+│   ├── get-started/        # Merchant signup flow
+│   ├── dashboard/          # Merchant dashboard (7 pages)
+│   ├── admin/              # Admin panel
+│   ├── onboarding/         # Onboarding flow view
+│   └── globals.css         # Global styles
+├── components/
+│   ├── ui/                 # shadcn/ui components
+│   ├── dashboard/          # Dashboard components
+│   ├── merchant/           # Merchant flow components
+│   ├── admin/              # Admin panel components
+│   ├── get-started/        # Get started flow components
+│   └── [other components]  # Shared components
+├── lib/
+│   ├── onboarding-data.ts  # Data models and constants
+│   └── utils.ts            # Utility functions
+├── data/
+│   └── mock-merchants.ts   # Mock merchant data
+└── types/
+    └── onboarding.ts       # TypeScript type definitions
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Key Components
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Dashboard View
+- Merchant profile panel showing GTV, locations, and cohort assignment
+- Overall progress overview with stage breakdown
+- Next actions panel with critical warnings
+- Interactive onboarding flow
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Full Flow View
+- Cohort selector with detailed configurations
+- Complete 10-step journey visualization
+- Stage-based organization with visual connectors
+- Step cards showing data collection requirements
 
-## Deploy on Vercel
+## Data Flow
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Each step tracks:
+- Step ID and title
+- Description and stage assignment
+- Completion status (pending, in-progress, completed, blocked)
+- Data collection requirements
+- Critical dependencies (e.g., KYB before hardware purchase)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Critical Flow Requirements
+
+1. **KYB Before Hardware Purchase**: Step 3 must complete before Step 5
+2. **Payouts Held Until Bank Verification**: Step 9 enables payouts after verification
+3. **Cohort-Specific Paths**: Different experiences for self-serve, assisted, and managed merchants
+
+## Customization
+
+### Adding New Steps
+
+1. Update `ONBOARDING_STEPS` in `/lib/onboarding-data.ts`
+2. Assign to appropriate stage
+3. Define data collection requirements
+
+### Modifying Cohorts
+
+1. Edit `COHORT_CONFIGS` in `/lib/onboarding-data.ts`
+2. Update thresholds and descriptions
+3. Adjust cohort-specific logic in components
+
+### Styling
+
+- Theme customization: `/app/globals.css`
+- Component styles: Tailwind classes in component files
+- shadcn/ui theme: `tailwind.config.ts`
+
+## Build for Production
+
+```bash
+npm run build
+npm start
+```
+
+## Future Enhancements
+
+- Backend integration for real merchant data
+- Real-time progress updates
+- AE/IC assignment workflow
+- Stall detection and alerts
+- Analytics dashboard
+- A/B testing framework
+- Multi-merchant management view
+
+## License
+
+Copyright Lightspeed Commerce Inc.
