@@ -1,5 +1,18 @@
 # Product Requirements Document: Cohort-Based Merchant Onboarding
 
+> **⚠️ HISTORICAL DOCUMENT**
+>
+> This is the **original 10-step PRD** that has been superseded by the revised 4-step merchant-centric approach.
+>
+> **Current PRD**: [merchant_onboarding_prd_revised.md](../merchant_onboarding_prd_revised.md)
+>
+> This document is preserved for historical reference and to understand the evolution of the product requirements.
+>
+> **Last Active**: October 2025
+> **Status**: Archived - Reference Only
+
+---
+
 ## Executive Summary
 
 **Product:** Unified X-Series and Lightspeed Payments Onboarding Experience  

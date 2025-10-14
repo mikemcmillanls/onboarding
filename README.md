@@ -4,7 +4,14 @@ A modern, interactive visualization of the cohort-based merchant onboarding syst
 
 ## Overview
 
-This application provides a comprehensive dashboard for visualizing and managing the 10-step merchant onboarding journey, organized into three distinct stages:
+A complete Next.js application that visualizes and manages the cohort-based merchant onboarding system for X-Series and Lightspeed Payments. The application features:
+
+- **Marketing Landing Page** - Public-facing site with product information
+- **Get Started Flow** - 4-step merchant signup and onboarding
+- **Merchant Dashboard** - Post-signup dashboard with 7 distinct sections
+- **Admin Panel** - Operations team view for monitoring all merchants
+
+This prototype demonstrates the complete merchant journey with interactive UI, smooth animations, and responsive design.
 
 ### Three-Stage Flow
 
@@ -164,6 +171,21 @@ npm start
 - A/B testing framework
 - Multi-merchant management view
 
+## Documentation
+
+Comprehensive documentation is available in the `/docs` directory:
+
+- **[Documentation Index](./docs/INDEX.md)** - Complete guide to all documentation
+- **[Quick Start](./docs/00-getting-started/QUICK_START.md)** - Developer setup guide
+- **[Product Requirements](./docs/01-product/merchant_onboarding_prd_revised.md)** - Full PRD
+- **[Design Specifications](./docs/02-design/DESIGN_SPECIFICATIONS.md)** - Complete design specs
+- **[Component Guide](./docs/03-implementation/COMPONENT_IMPLEMENTATION_GUIDE.md)** - Implementation details
+
 ## License
 
 Copyright Lightspeed Commerce Inc.
+
+---
+
+**Built with**: Next.js 15.5.4, TypeScript, Tailwind CSS 4, shadcn/ui, Framer Motion
+**Last Updated**: October 2025
