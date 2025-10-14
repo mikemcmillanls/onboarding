@@ -7,9 +7,8 @@ A modern, interactive visualization of the cohort-based merchant onboarding syst
 A complete Next.js application that visualizes and manages the cohort-based merchant onboarding system for X-Series and Lightspeed Payments. The application features:
 
 - **Marketing Landing Page** - Public-facing site with product information
-- **Get Started Flow** - 4-step merchant signup and onboarding
-- **Merchant Dashboard** - Post-signup dashboard with 7 distinct sections
-- **Admin Panel** - Operations team view for monitoring all merchants
+- **Get Started Flow** - 2-page merchant signup and onboarding
+- **Merchant Dashboard** - Post-signup dashboard with 6-task checklist
 
 This prototype demonstrates the complete merchant journey with interactive UI, smooth animations, and responsive design.
 
@@ -84,23 +83,20 @@ npm run dev
 ├── app/
 │   ├── layout.tsx          # Root layout with metadata
 │   ├── page.tsx            # Landing page
-│   ├── get-started/        # Merchant signup flow
-│   ├── dashboard/          # Merchant dashboard (7 pages)
-│   ├── admin/              # Admin panel
-│   ├── onboarding/         # Onboarding flow view
+│   ├── get-started/        # Merchant signup flow (2 pages)
+│   ├── dashboard/          # Merchant dashboard (6 task pages)
+│   ├── onboarding/         # Onboarding flow visualization
 │   └── globals.css         # Global styles
 ├── components/
 │   ├── ui/                 # shadcn/ui components
 │   ├── dashboard/          # Dashboard components
 │   ├── merchant/           # Merchant flow components
-│   ├── admin/              # Admin panel components
 │   ├── get-started/        # Get started flow components
 │   └── [other components]  # Shared components
 ├── lib/
 │   ├── onboarding-data.ts  # Data models and constants
+│   ├── merchant-mock-data.ts # Mock merchant data
 │   └── utils.ts            # Utility functions
-├── data/
-│   └── mock-merchants.ts   # Mock merchant data
 └── types/
     └── onboarding.ts       # TypeScript type definitions
 ```

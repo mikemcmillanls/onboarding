@@ -11,8 +11,7 @@ import {
   TrendingUp,
   CreditCard,
   ShoppingBag,
-  BarChart3,
-  Settings
+  BarChart3
 } from 'lucide-react';
 
 export default function LandingPage() {
@@ -76,12 +75,6 @@ export default function LandingPage() {
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <Link href="/admin">
-                <Button variant="ghost" size="sm">
-                  <Settings className="w-4 h-4 mr-2" />
-                  Admin
-                </Button>
-              </Link>
               <Link href="/get-started">
                 <Button size="sm">
                   Get Started

@@ -145,15 +145,9 @@ See [Quick Start](00-getting-started/QUICK_START.md) for details.
 
 ### Merchant Experience
 - **Marketing landing page** - Public-facing product information
-- **4-step signup flow** - Streamlined onboarding journey
-- **Merchant dashboard** - Post-signup hub with 7 sections
+- **2-page signup flow** - Streamlined account creation and business profiling
+- **Merchant dashboard** - Post-signup hub with 6-task checklist
 - **Cohort-specific routing** - Different experiences by business size
-
-### Admin Experience
-- **Operations dashboard** - Monitor all merchant progress
-- **Merchant detail views** - Complete merchant profiles
-- **Cohort filtering** - View by self-serve, assisted, or managed
-- **Progress tracking** - See completion status across all steps
 
 ### Technical Highlights
 - **Responsive design** - Mobile-first, works on all devices
@@ -170,23 +164,19 @@ See [Quick Start](00-getting-started/QUICK_START.md) for details.
 /
 ├── app/                    # Next.js pages
 │   ├── page.tsx           # Marketing landing page
-│   ├── get-started/       # 4-step signup flow
-│   ├── dashboard/         # Merchant dashboard (7 pages)
-│   └── admin/             # Operations panel
+│   ├── get-started/       # 2-page signup flow
+│   └── dashboard/         # Merchant dashboard (6 task pages)
 │
 ├── components/
 │   ├── ui/                # shadcn/ui base components
 │   ├── dashboard/         # Dashboard-specific components
 │   ├── merchant/          # Merchant flow components
-│   ├── admin/             # Admin panel components
 │   └── get-started/       # Get started flow components
 │
 ├── lib/
 │   ├── onboarding-data.ts # Data models and configurations
+│   ├── merchant-mock-data.ts # Mock merchant data
 │   └── utils.ts           # Utility functions
-│
-├── data/
-│   └── mock-merchants.ts  # Mock merchant data for admin panel
 │
 └── types/
     └── onboarding.ts      # TypeScript type definitions

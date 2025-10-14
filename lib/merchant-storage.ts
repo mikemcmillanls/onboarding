@@ -93,43 +93,6 @@ export const MerchantStorage = {
   },
 
   /**
-   * Convert StoredMerchant to admin table format
-   */
-  toAdminFormat(merchant: StoredMerchant) {
-    return {
-      id: merchant.id,
-      merchantId: merchant.id,
-      merchantName: merchant.signUpData?.businessName || 'Unknown Business',
-      email: merchant.signUpData?.email || '',
-      phone: merchant.signUpData?.phone || '',
-      cohort: merchant.cohort || 'self-serve',
-      currentStep: merchant.currentStep,
-      progressPercent: (merchant.currentStep / 4) * 100,
-      status: this.calculateStatus(merchant),
-      createdAt: new Date(merchant.createdAt),
-      lastActivity: new Date(merchant.updatedAt),
-
-      // Full data for detail view
-      signUpData: merchant.signUpData,
-      posSetupData: merchant.posSetupData,
-      checkoutData: merchant.checkoutData,
-      bankAccountData: merchant.bankAccountData,
-      setupTasks: merchant.setupTasks,
-
-      // Verification statuses
-      kybStatus: merchant.kybStatus,
-      kycStatus: merchant.kycStatus || 'pending',
-      orderConfirmed: merchant.orderConfirmed || false,
-      hardwareShipped: merchant.hardwareShipped || false,
-      paymentsActive: merchant.paymentsActive || false,
-      payoutsEnabled: merchant.payoutsEnabled || false,
-
-      // Specialist
-      assignedSpecialist: merchant.assignedSpecialist,
-    };
-  },
-
-  /**
    * Calculate merchant status based on activity
    */
   calculateStatus(merchant: StoredMerchant): 'active' | 'stalled' | 'completed' | 'blocked' {

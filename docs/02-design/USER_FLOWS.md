@@ -16,9 +16,8 @@ This document describes the actual user flows as implemented in the current appl
 2. [Merchant Signup Flow](#merchant-signup-flow)
 3. [Merchant Dashboard](#merchant-dashboard)
 4. [Individual Task Pages](#individual-task-pages)
-5. [Admin Dashboard Flow](#admin-dashboard-flow)
-6. [Data Flow](#data-flow)
-7. [Cohort Assignment](#cohort-assignment)
+5. [Data Flow](#data-flow)
+6. [Cohort Assignment](#cohort-assignment)
 
 ---
 
@@ -34,9 +33,8 @@ This document describes the actual user flows as implemented in the current appl
 2. Views hero section with value proposition
 3. Scrolls through features grid and benefits
 4. Sees social proof and trust indicators
-5. Two primary actions available:
+5. Primary action available:
    - **Get Started** button → Redirects to `/get-started`
-   - **Admin** button (top nav) → Redirects to `/admin`
 
 ### Key Features
 
@@ -166,7 +164,7 @@ Automatic cohort assignment based on business size:
 
 **Current Implementation**:
 - All cohorts see the same merchant-facing UI
-- Cohort affects admin panel display and routing
+- Cohort stored for future specialist assignment
 - Future: Will affect specialist assignment and pricing
 
 ---
@@ -459,110 +457,6 @@ All task pages follow a consistent structure and pattern.
 
 ---
 
-## Admin Dashboard Flow
-
-**Route**: `/admin`
-
-**Purpose**: Operations team view to monitor all merchant onboarding progress
-
----
-
-### Admin Dashboard Overview
-
-**Header**:
-- "Admin Dashboard" title
-- "Merchant Onboarding Tracking System" subtitle
-- Back button to marketing page
-
-**Key Metrics** (4 stat cards):
-- **Total Merchants**: Count of all merchants
-- **Active**: Merchants in progress (green badge)
-- **Stalled**: Merchants needing intervention (yellow badge)
-- **Completed**: Fully onboarded merchants (blue badge)
-
-**Main Content**:
-- Merchant table with columns:
-  - Business Name
-  - Email
-  - Cohort (Self-Serve, Assisted, Managed)
-  - Status (Active, Stalled, Completed)
-  - Created Date
-  - Progress % (visual progress bar)
-
-**Actions**:
-- Click any row → Navigate to merchant detail page
-- Sortable columns (future)
-- Filter by cohort/status (future)
-
----
-
-### Data Source
-
-**Merchant List** (`app/admin/page.tsx:15-40`):
-- Combines localStorage merchants with mock data
-- Polls for updates every 2 seconds
-- Deduplicates by email address
-- Shows real merchants from signup flow + mock data for demo
-
----
-
-### Merchant Detail Page
-
-**Route**: `/admin/merchant/[id]`
-
-**Purpose**: Comprehensive view of individual merchant profile and progress
-
-**Sections**:
-
-1. **Business Overview**
-   - Business name
-   - Business category
-   - Cohort badge (color-coded)
-   - Status indicator
-
-2. **Contact Information**
-   - Email address
-   - Phone number (if provided)
-   - Primary contact name
-
-3. **Business Address**
-   - Full address from signup
-   - Maps integration (future)
-
-4. **Financial Details**
-   - Annual revenue range
-   - Number of locations
-   - GTV estimates (future)
-
-5. **Onboarding Progress**
-   - Step-by-step completion status
-   - Task checklist with timestamps
-   - Overall progress percentage
-   - Days since signup
-
-6. **Collected Data**
-   - All form data from signup
-   - POS configuration details
-   - Hardware selections
-   - Bank account status (masked)
-
-7. **Timeline**
-   - Account created
-   - Each task completion
-   - Last activity timestamp
-
-8. **Billing Address** (if checkout completed)
-   - Billing information
-   - Payment method (masked)
-
-**Actions**:
-- Back to admin dashboard
-- Edit merchant (future)
-- Contact merchant (future)
-- View detailed logs (future)
-
----
-
 ## Data Flow
 
 ### Storage Architecture
@@ -582,8 +476,6 @@ localStorage ('prequalificationData')
 Dashboard Loads Data
       ↓
 Individual Task Pages Read/Write
-      ↓
-Admin Dashboard Aggregates All Merchants
 ```
 
 ---
@@ -623,26 +515,11 @@ Array<{
 }>
 ```
 
-**`allMerchants`** (admin view):
-```typescript
-Array<{
-  id: string;
-  businessName: string;
-  email: string;
-  cohort: string;
-  status: 'active' | 'stalled' | 'completed';
-  createdAt: string;
-  progress: number;
-  // ... all other merchant data
-}>
-```
-
 ---
 
 ### Data Synchronization
 
 **Current Implementation**:
-- Admin dashboard polls every 2 seconds
 - Manual refresh required for dashboard updates
 - No real-time WebSocket connection
 
@@ -682,11 +559,7 @@ Array<{
 
 **Current State**:
 - All cohorts use the same merchant-facing UI
-- Cohort badge shown in admin panel
-- Different colors for visual distinction:
-  - Self-Serve: Blue
-  - Assisted: Purple
-  - Managed: Amber
+- Cohort stored for future routing and specialist assignment
 
 **Future Differentiation**:
 - **Self-Serve**: No changes to current flow
@@ -738,10 +611,6 @@ Array<{
 - `/dashboard/team` - Team setup
 - `/dashboard/settings` - Account settings
 
-**Admin Routes**:
-- `/admin` - Admin dashboard (merchant list)
-- `/admin/merchant/[id]` - Merchant detail view
-
 **Demo/Visualization Routes**:
 - `/onboarding` - 10-step onboarding flow visualization (not part of main flow)
 
@@ -752,7 +621,6 @@ Array<{
 **Back Navigation**:
 - All task pages have "Back to Dashboard" button
 - Get Started Page 2 has "Back" to Page 1
-- Admin detail has "Back to Admin Dashboard"
 
 **Breadcrumbs**:
 - Not currently implemented
@@ -940,7 +808,7 @@ Array<{
 
 ## Conclusion
 
-This document describes the complete user flows as implemented in the current application. All flows are functional and testable in the prototype. The system provides a streamlined signup process followed by a task-based dashboard approach, with comprehensive admin oversight capabilities.
+This document describes the complete user flows as implemented in the current application. All flows are functional and testable in the prototype. The system provides a streamlined signup process followed by a task-based dashboard approach.
 
 For detailed UI specifications, see [DESIGN_SPECIFICATIONS.md](./DESIGN_SPECIFICATIONS.md).
 
