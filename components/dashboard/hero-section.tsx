@@ -8,7 +8,7 @@ interface HeroSectionProps {
   total: number;
 }
 
-export function HeroSection({ businessName, completed, total }: HeroSectionProps) {
+export function HeroSection({ completed, total }: HeroSectionProps) {
   const isComplete = completed === total;
   const remaining = total - completed;
 

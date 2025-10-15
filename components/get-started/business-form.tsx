@@ -222,7 +222,7 @@ export function BusinessForm({ onSubmit, onBack, initialData }: BusinessFormProp
                   placeholder="https://yourbusiness.com"
                 />
                 <p className="text-sm text-muted-foreground">
-                  We'll use this to verify your business information
+                  We&apos;ll use this to verify your business information
                 </p>
                 {touched.businessWebsite && errors.businessWebsite && (
                   <motion.p

@@ -273,7 +273,7 @@ export default function DashboardPage() {
                   <li>Complete Your Purchase</li>
                 </ol>
                 <p className="text-sm text-blue-700 font-medium">
-                  After purchase, we'll activate payments in 1-2 days.
+                  After purchase, we&apos;ll activate payments in 1-2 days.
                 </p>
                 <p className="text-sm text-blue-600 mt-1">
                   You can add your bank account anytime to receive payouts.

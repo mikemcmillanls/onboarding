@@ -138,7 +138,7 @@ export function AccountForm({ onNext, initialData }: AccountFormProps) {
       {/* Header Section */}
       <div className="text-center mb-6">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">
-          Let's create your account
+          Let&apos;s create your account
         </h1>
         <p className="text-base text-gray-600">
           Signing up for Lightspeed is fast and free—no commitments or long-term contracts.
@@ -258,7 +258,7 @@ export function AccountForm({ onNext, initialData }: AccountFormProps) {
             className="mt-0.5"
           />
           <label htmlFor="terms" className="text-sm text-gray-700 leading-snug cursor-pointer">
-            I agree to Lightspeed's{' '}
+            I agree to Lightspeed&apos;s{' '}
             <Link href="#" className="text-blue-600 hover:text-blue-700 underline">
               Terms
             </Link>
