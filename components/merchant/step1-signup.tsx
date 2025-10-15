@@ -407,7 +407,7 @@ export function Step1SignUp({ onComplete, initialData }: Step1SignUpProps) {
                         id="street"
                         value={formData.businessAddress?.street}
                         onChange={(e) => updateAddress('street', e.target.value)}
-                        className={errors['businessAddress.street'] ? 'border-red-500' : ''}}
+                        className={errors['businessAddress.street'] ? 'border-red-500' : ''}
                       />
                       {errors['businessAddress.street'] && (
                         <p className="text-sm text-red-500">{errors['businessAddress.street']}</p>
@@ -421,7 +421,7 @@ export function Step1SignUp({ onComplete, initialData }: Step1SignUpProps) {
                           id="city"
                           value={formData.businessAddress?.city}
                           onChange={(e) => updateAddress('city', e.target.value)}
-                          className={errors['businessAddress.city'] ? 'border-red-500' : ''}}
+                          className={errors['businessAddress.city'] ? 'border-red-500' : ''}
                         />
                         {errors['businessAddress.city'] && (
                           <p className="text-sm text-red-500">{errors['businessAddress.city']}</p>
@@ -434,7 +434,7 @@ export function Step1SignUp({ onComplete, initialData }: Step1SignUpProps) {
                           value={formData.businessAddress?.state}
                           onValueChange={(value) => updateAddress('state', value)}
                         >
-                          <SelectTrigger className={errors['businessAddress.state'] ? 'border-red-500' : ''}}>
+                          <SelectTrigger className={errors['businessAddress.state'] ? 'border-red-500' : ''}>
                             <SelectValue placeholder="Select state" />
                           </SelectTrigger>
                           <SelectContent>
@@ -457,7 +457,7 @@ export function Step1SignUp({ onComplete, initialData }: Step1SignUpProps) {
                         id="zipCode"
                         value={formData.businessAddress?.zipCode}
                         onChange={(e) => updateAddress('zipCode', e.target.value)}
-                        className={errors['businessAddress.zipCode'] ? 'border-red-500' : ''}}
+                        className={errors['businessAddress.zipCode'] ? 'border-red-500' : ''}
                         placeholder="12345"
                       />
                       {errors['businessAddress.zipCode'] && (
