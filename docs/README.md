@@ -111,9 +111,12 @@ Reusable design system reference.
 Third-party API integration documentation.
 
 **Files:**
+- `PAYMENT_FLOW_OPTIMIZATION.md` - **PRIMARY REFERENCE**: Comprehensive payment flow optimization strategy (speed, risk, experience, cost, segments)
 - `STRIPE_PAYMENT_SETUP_FLOW.md` - Stripe Connect integration guide for payment processing
 - `TRUEBIZ_VERIFICATION_API.md` - TrueBiz API reference for business verification (planned)
 - `TRUEBIZ_INTEGRATION_ANALYSIS.md` - Complete analysis and implementation plan for TrueBiz integration at signup
+- `STRIPE_IDENTITY_VS_TRULIOO_ANALYSIS.md` - Analysis of Stripe Identity vs third-party verification providers
+- `STRIPE_TRULIOO_ANALYSIS_VALIDATION_REPORT.md` - Validation of Stripe analysis claims against official documentation
 
 ---
 

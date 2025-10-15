@@ -150,7 +150,9 @@ Claude Code has access to specialized agents for complex tasks. Use these agents
 
 Detailed integration documentation is available in `/docs/05-integrations/`:
 
+- **PAYMENT_FLOW_OPTIMIZATION.md**: **PRIMARY REFERENCE** for payment flow optimization strategy across speed-to-transact, risk underwriting, merchant experience, segment-specific flows, and cost optimization (Stripe-compliant)
 - **STRIPE_PAYMENT_SETUP_FLOW.md**: Complete Stripe Connect integration guide for payment processing setup
+- **STRIPE_IDENTITY_VS_TRULIOO_ANALYSIS.md**: Analysis comparing Stripe Identity vs third-party verification providers (Trulioo, TrueBiz)
 - **TRUEBIZ_VERIFICATION_API.md**: TrueBiz API reference for business verification (planned integration)
 - **TRUEBIZ_INTEGRATION_ANALYSIS.md**: Comprehensive analysis of adding TrueBiz verification at signup, including ROI analysis and implementation plan
 
