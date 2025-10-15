@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Sidebar } from '@/components/dashboard/sidebar';
 import { HeroSection } from '@/components/dashboard/hero-section';
-import { ProgressIndicator } from '@/components/dashboard/progress-indicator';
 import { ChecklistCard } from '@/components/dashboard/checklist-card';
 import { MerchantStorage, StoredMerchant } from '@/lib/merchant-storage';
 import { ChecklistTask } from '@/types/merchant-onboarding';
@@ -238,17 +237,12 @@ export default function DashboardPage() {
       <main className="lg:ml-[240px] min-h-screen">
         <div className="max-w-6xl mx-auto px-6 py-8 md:px-8 md:py-10 lg:px-12 lg:py-12">
           {/* Hero Section */}
-          <div className="mb-6">
+          <div className="mb-10">
             <HeroSection
               businessName={businessName}
               completed={completedTasks}
               total={totalTasks}
             />
-          </div>
-
-          {/* Progress Indicator */}
-          <div className="mb-10">
-            <ProgressIndicator completed={completedTasks} total={totalTasks} />
           </div>
 
           {/* Checklist Section */}
