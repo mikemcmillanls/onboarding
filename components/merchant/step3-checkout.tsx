@@ -5,20 +5,11 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { CheckoutData } from '@/types/merchant-onboarding';
 import { PricingBreakdown } from '@/types/merchant-onboarding';
-import { US_STATES } from '@/lib/merchant-mock-data';
 import { CreditCard, Shield, Package, Loader2, CheckCircle2 } from 'lucide-react';
-import { cn } from '@/lib/utils';
 
 interface Step3CheckoutProps {
   onComplete: (data: CheckoutData) => void;
@@ -64,7 +55,7 @@ export function Step3Checkout({ onComplete, onBack, pricing, businessAddress }: 
       [section]: {
         ...prev[section as keyof CheckoutData],
         [subsection]: {
-          ...(prev[section as keyof CheckoutData] as any)?.[subsection],
+          ...(prev[section as keyof CheckoutData] as Record<string, unknown>)?.[subsection],
           [field]: value,
         },
       },
@@ -162,7 +153,7 @@ export function Step3Checkout({ onComplete, onBack, pricing, businessAddress }: 
             <div className="text-center space-y-4">
               <Loader2 className="w-16 h-16 mx-auto animate-spin text-blue-600" />
               <h3 className="text-xl font-semibold">Processing Your Order...</h3>
-              <p className="text-muted-foreground">Please don't close this window</p>
+              <p className="text-muted-foreground">Please don&apos;t close this window</p>
             </div>
           </CardContent>
         </Card>

@@ -26,7 +26,6 @@ type FormPage = 'account' | 'business-legal' | 'verification';
 
 export function Step1SignUp({ onComplete, initialData }: Step1SignUpProps) {
   const [page, setPage] = useState<FormPage>('account');
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [verificationStatus, setVerificationStatus] = useState<'pending' | 'approved' | 'review' | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -118,7 +117,6 @@ export function Step1SignUp({ onComplete, initialData }: Step1SignUpProps) {
   const handleBusinessPageSubmit = async () => {
     if (!validateBusinessPage()) return;
 
-    setIsSubmitting(true);
     setPage('verification');
 
     // Simulate KYB verification
@@ -143,8 +141,6 @@ export function Step1SignUp({ onComplete, initialData }: Step1SignUpProps) {
 
       onComplete(formData as SignUpFormData, cohort);
     }
-
-    setIsSubmitting(false);
   };
 
   return (
@@ -391,7 +387,7 @@ export function Step1SignUp({ onComplete, initialData }: Step1SignUpProps) {
                       placeholder="XX-XXXXXXX"
                     />
                     <p className="text-xs text-muted-foreground">
-                      Use SSN if you're a sole proprietor
+                      Use SSN if you&apos;re a sole proprietor
                     </p>
                     {errors.taxId && (
                       <p className="text-sm text-red-500">{errors.taxId}</p>
@@ -538,7 +534,7 @@ export function Step1SignUp({ onComplete, initialData }: Step1SignUpProps) {
                       <AlertCircle className="w-16 h-16 mx-auto text-orange-600" />
                       <h3 className="text-xl font-semibold">We&apos;re Reviewing Your Information</h3>
                       <p className="text-muted-foreground">
-                        This usually takes 1-2 hours. We&apos;ll email you as soon as you're approved.
+                        This usually takes 1-2 hours. We&apos;ll email you as soon as you&apos;re approved.
                       </p>
                       <div className="mt-6">
                         <Button variant="outline" onClick={() => window.location.reload()}>
