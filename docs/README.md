@@ -91,7 +91,9 @@ Design specifications, user flows, and UI copy.
 
 **Files:**
 - `DESIGN_SPECIFICATIONS.md` - Complete UX/UI specifications for all 4 steps
-- `USER_FLOWS.md` - Visual flow diagrams
+- `USER_FLOW_01_SIGNUP_AND_PROVISIONING.md` - Signup flow from website to account creation
+- `USER_FLOW_02_DASHBOARD_AND_PAYMENTS.md` - Dashboard and payment setup (critical tasks)
+- `USER_FLOW_03_ADDITIONAL_SETUP.md` - Optional tasks and technical implementation
 - `UI_COPY.md` - All interface copy and messaging
 
 ### 03-implementation/
@@ -136,7 +138,10 @@ See [Quick Start](00-getting-started/QUICK_START.md) for details.
 → Read [Product Requirements](01-product/PRODUCT_REQUIREMENTS.md)
 
 **See how users move through the flow**
-→ Review [User Flows](02-design/USER_FLOWS.md)
+→ Review User Flows:
+  - [Flow 1: Signup & Provisioning](02-design/USER_FLOW_01_SIGNUP_AND_PROVISIONING.md)
+  - [Flow 2: Dashboard & Payments](02-design/USER_FLOW_02_DASHBOARD_AND_PAYMENTS.md)
+  - [Flow 3: Additional Setup](02-design/USER_FLOW_03_ADDITIONAL_SETUP.md)
 
 **Implement a new component**
 → Follow [Component Guide](03-implementation/COMPONENT_GUIDE.md)
@@ -279,5 +284,5 @@ Each topic has **one authoritative document**:
 ---
 
 **Last Updated**: January 2025
-**Total Documentation Files**: 13
+**Total Documentation Files**: 15
 **Documentation Coverage**: Current product state + planned integrations
