@@ -251,37 +251,6 @@ export default function DashboardPage() {
             <ProgressIndicator completed={completedTasks} total={totalTasks} />
           </div>
 
-          {/* Payment Activation Flow Banner */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="mb-8 p-6 bg-blue-50 border-2 border-blue-200 rounded-lg"
-          >
-            <div className="flex items-start gap-3">
-              <div className="text-2xl">🎯</div>
-              <div className="flex-1">
-                <h3 className="text-lg font-semibold text-blue-900 mb-2">
-                  Ready to accept payments?
-                </h3>
-                <p className="text-blue-800 mb-3">
-                  Complete these 3 steps to activate payment processing:
-                </p>
-                <ol className="list-decimal list-inside space-y-1 text-blue-800 mb-3">
-                  <li>Verify Your Identity (10-15 minutes)</li>
-                  <li>Configure Your POS (2-3 minutes)</li>
-                  <li>Complete Your Purchase</li>
-                </ol>
-                <p className="text-sm text-blue-700 font-medium">
-                  After purchase, we&apos;ll activate payments in 1-2 days.
-                </p>
-                <p className="text-sm text-blue-600 mt-1">
-                  You can add your bank account anytime to receive payouts.
-                </p>
-              </div>
-            </div>
-          </motion.div>
-
           {/* Checklist Section */}
           <motion.div
             initial={{ opacity: 0 }}
