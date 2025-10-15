@@ -16,7 +16,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { SignUpFormData } from '@/types/merchant-onboarding';
 import { BUSINESS_CATEGORIES, REVENUE_RANGES, BUSINESS_STRUCTURES, US_STATES } from '@/lib/merchant-mock-data';
 import { ArrowRight, ArrowLeft, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
-import { cn } from '@/lib/utils';
 
 interface Step1SignUpProps {
   onComplete: (data: SignUpFormData, cohort: 'self-serve' | 'assisted' | 'managed') => void;
@@ -66,7 +65,7 @@ export function Step1SignUp({ onComplete, initialData }: Step1SignUpProps) {
     }
   };
 
-  const updateAddress = (field: string, value: string) => {
+  const updateAddress = (field: string, value: unknown) => {
     setFormData(prev => ({
       ...prev,
       businessAddress: {
@@ -163,7 +162,7 @@ export function Step1SignUp({ onComplete, initialData }: Step1SignUpProps) {
               <CardHeader>
                 <CardTitle>Create Your Account</CardTitle>
                 <CardDescription>
-                  Let's get started with some basic information about you and your business
+                  Let&apos;s get started with some basic information about you and your business
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -176,7 +175,7 @@ export function Step1SignUp({ onComplete, initialData }: Step1SignUpProps) {
                         id="firstName"
                         value={formData.firstName}
                         onChange={(e) => updateField('firstName', e.target.value)}
-                        className={cn(errors.firstName && 'border-red-500')}
+                        className={errors.firstName ? 'border-red-500' : ''}
                       />
                       {errors.firstName && (
                         <p className="text-sm text-red-500">{errors.firstName}</p>
@@ -189,7 +188,7 @@ export function Step1SignUp({ onComplete, initialData }: Step1SignUpProps) {
                         id="lastName"
                         value={formData.lastName}
                         onChange={(e) => updateField('lastName', e.target.value)}
-                        className={cn(errors.lastName && 'border-red-500')}
+                        className={errors.lastName ? 'border-red-500' : ''}
                       />
                       {errors.lastName && (
                         <p className="text-sm text-red-500">{errors.lastName}</p>
@@ -204,7 +203,7 @@ export function Step1SignUp({ onComplete, initialData }: Step1SignUpProps) {
                       type="email"
                       value={formData.email}
                       onChange={(e) => updateField('email', e.target.value)}
-                      className={cn(errors.email && 'border-red-500')}
+                      className={errors.email ? 'border-red-500' : ''}
                     />
                     {errors.email && (
                       <p className="text-sm text-red-500">{errors.email}</p>
@@ -218,7 +217,7 @@ export function Step1SignUp({ onComplete, initialData }: Step1SignUpProps) {
                       type="password"
                       value={formData.password}
                       onChange={(e) => updateField('password', e.target.value)}
-                      className={cn(errors.password && 'border-red-500')}
+                      className={errors.password ? 'border-red-500' : ''}
                     />
                     <p className="text-xs text-muted-foreground">At least 8 characters</p>
                     {errors.password && (
@@ -233,7 +232,7 @@ export function Step1SignUp({ onComplete, initialData }: Step1SignUpProps) {
                       type="tel"
                       value={formData.phone}
                       onChange={(e) => updateField('phone', e.target.value)}
-                      className={cn(errors.phone && 'border-red-500')}
+                      className={errors.phone ? 'border-red-500' : ''}
                       placeholder="(555) 123-4567"
                     />
                     {errors.phone && (
@@ -252,7 +251,7 @@ export function Step1SignUp({ onComplete, initialData }: Step1SignUpProps) {
                       id="businessName"
                       value={formData.businessName}
                       onChange={(e) => updateField('businessName', e.target.value)}
-                      className={cn(errors.businessName && 'border-red-500')}
+                      className={errors.businessName ? 'border-red-500' : ''}
                       placeholder="e.g., Riverside Coffee Co."
                     />
                     {errors.businessName && (
@@ -266,7 +265,7 @@ export function Step1SignUp({ onComplete, initialData }: Step1SignUpProps) {
                       value={formData.businessCategory}
                       onValueChange={(value) => updateField('businessCategory', value)}
                     >
-                      <SelectTrigger className={cn(errors.businessCategory && 'border-red-500')}>
+                      <SelectTrigger className={errors.businessCategory ? 'border-red-500' : ''}>
                         <SelectValue placeholder="Select your business type" />
                       </SelectTrigger>
                       <SelectContent>
@@ -288,7 +287,7 @@ export function Step1SignUp({ onComplete, initialData }: Step1SignUpProps) {
                       value={formData.revenueRange}
                       onValueChange={(value) => updateField('revenueRange', value)}
                     >
-                      <SelectTrigger className={cn(errors.revenueRange && 'border-red-500')}>
+                      <SelectTrigger className={errors.revenueRange ? 'border-red-500' : ''}>
                         <SelectValue placeholder="Select your annual revenue" />
                       </SelectTrigger>
                       <SelectContent>
@@ -312,7 +311,7 @@ export function Step1SignUp({ onComplete, initialData }: Step1SignUpProps) {
                       min="1"
                       value={formData.locationCount}
                       onChange={(e) => updateField('locationCount', parseInt(e.target.value) || 1)}
-                      className={cn(errors.locationCount && 'border-red-500')}
+                      className={errors.locationCount ? 'border-red-500' : ''}
                     />
                     {errors.locationCount && (
                       <p className="text-sm text-red-500">{errors.locationCount}</p>
@@ -352,7 +351,7 @@ export function Step1SignUp({ onComplete, initialData }: Step1SignUpProps) {
                       id="legalBusinessName"
                       value={formData.legalBusinessName}
                       onChange={(e) => updateField('legalBusinessName', e.target.value)}
-                      className={cn(errors.legalBusinessName && 'border-red-500')}
+                      className={errors.legalBusinessName ? 'border-red-500' : ''}
                       placeholder="As registered with the IRS"
                     />
                     {errors.legalBusinessName && (
@@ -366,7 +365,7 @@ export function Step1SignUp({ onComplete, initialData }: Step1SignUpProps) {
                       value={formData.businessStructure}
                       onValueChange={(value) => updateField('businessStructure', value)}
                     >
-                      <SelectTrigger className={cn(errors.businessStructure && 'border-red-500')}>
+                      <SelectTrigger className={errors.businessStructure ? 'border-red-500' : ''}>
                         <SelectValue placeholder="Select business structure" />
                       </SelectTrigger>
                       <SelectContent>
@@ -388,7 +387,7 @@ export function Step1SignUp({ onComplete, initialData }: Step1SignUpProps) {
                       id="taxId"
                       value={formData.taxId}
                       onChange={(e) => updateField('taxId', e.target.value)}
-                      className={cn(errors.taxId && 'border-red-500')}
+                      className={errors.taxId ? 'border-red-500' : ''}
                       placeholder="XX-XXXXXXX"
                     />
                     <p className="text-xs text-muted-foreground">
@@ -408,7 +407,7 @@ export function Step1SignUp({ onComplete, initialData }: Step1SignUpProps) {
                         id="street"
                         value={formData.businessAddress?.street}
                         onChange={(e) => updateAddress('street', e.target.value)}
-                        className={cn(errors['businessAddress.street'] && 'border-red-500')}
+                        className={errors['businessAddress.street'] ? 'border-red-500' : ''}}
                       />
                       {errors['businessAddress.street'] && (
                         <p className="text-sm text-red-500">{errors['businessAddress.street']}</p>
@@ -422,7 +421,7 @@ export function Step1SignUp({ onComplete, initialData }: Step1SignUpProps) {
                           id="city"
                           value={formData.businessAddress?.city}
                           onChange={(e) => updateAddress('city', e.target.value)}
-                          className={cn(errors['businessAddress.city'] && 'border-red-500')}
+                          className={errors['businessAddress.city'] ? 'border-red-500' : ''}}
                         />
                         {errors['businessAddress.city'] && (
                           <p className="text-sm text-red-500">{errors['businessAddress.city']}</p>
@@ -435,7 +434,7 @@ export function Step1SignUp({ onComplete, initialData }: Step1SignUpProps) {
                           value={formData.businessAddress?.state}
                           onValueChange={(value) => updateAddress('state', value)}
                         >
-                          <SelectTrigger className={cn(errors['businessAddress.state'] && 'border-red-500')}>
+                          <SelectTrigger className={errors['businessAddress.state'] ? 'border-red-500' : ''}}>
                             <SelectValue placeholder="Select state" />
                           </SelectTrigger>
                           <SelectContent>
@@ -458,7 +457,7 @@ export function Step1SignUp({ onComplete, initialData }: Step1SignUpProps) {
                         id="zipCode"
                         value={formData.businessAddress?.zipCode}
                         onChange={(e) => updateAddress('zipCode', e.target.value)}
-                        className={cn(errors['businessAddress.zipCode'] && 'border-red-500')}
+                        className={errors['businessAddress.zipCode'] ? 'border-red-500' : ''}}
                         placeholder="12345"
                       />
                       {errors['businessAddress.zipCode'] && (
@@ -537,9 +536,9 @@ export function Step1SignUp({ onComplete, initialData }: Step1SignUpProps) {
                       transition={{ type: 'spring', stiffness: 200, damping: 15 }}
                     >
                       <AlertCircle className="w-16 h-16 mx-auto text-orange-600" />
-                      <h3 className="text-xl font-semibold">We're Reviewing Your Information</h3>
+                      <h3 className="text-xl font-semibold">We&apos;re Reviewing Your Information</h3>
                       <p className="text-muted-foreground">
-                        This usually takes 1-2 hours. We'll email you as soon as you're approved.
+                        This usually takes 1-2 hours. We&apos;ll email you as soon as you're approved.
                       </p>
                       <div className="mt-6">
                         <Button variant="outline" onClick={() => window.location.reload()}>

@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { SetupTask, BankAccountData } from '@/types/merchant-onboarding';
@@ -22,7 +22,6 @@ import {
   Circle,
   ChevronDown,
   ChevronUp,
-  Loader2,
   ExternalLink,
   Package,
   CreditCard,
@@ -389,7 +388,7 @@ export function Step4Setup({ onComplete, cohort, assignedSpecialist }: Step4Setu
                   <Sparkles className="w-16 h-16 mx-auto text-green-600" />
                 </motion.div>
                 <div>
-                  <h3 className="text-2xl font-bold">You're All Set!</h3>
+                  <h3 className="text-2xl font-bold">You&apos;re All Set!</h3>
                   <p className="text-muted-foreground mt-2">
                     Your Lightspeed POS is ready to process payments
                   </p>

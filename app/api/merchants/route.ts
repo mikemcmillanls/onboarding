@@ -28,7 +28,7 @@ async function readMerchants(): Promise<StoredMerchant[]> {
   try {
     const data = await fs.readFile(MERCHANTS_FILE, 'utf-8');
     return JSON.parse(data);
-  } catch (error) {
+  } catch {
     // File doesn't exist yet
     return [];
   }
