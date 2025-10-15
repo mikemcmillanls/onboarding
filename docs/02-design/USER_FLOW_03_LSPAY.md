@@ -32,10 +32,14 @@ This flow uses multiple verification providers at different stages:
 - **Status**: Currently implemented and active
 - **Why**: Required by Stripe and federal regulations (Bank Secrecy Act, AML)
 
-### **Stripe Identity** (Future Alternative)
-- **Status**: Not yet implemented
-- **Purpose**: Could replace Trulioo for identity verification in the future
-- **Note**: Stripe's built-in identity verification API (document upload, selfie, liveness checks)
+### **Stripe Identity** (Fallback Verification)
+- **When**: If Trulioo verification fails OR country regulations require biometric liveness checks
+- **Purpose**: Document verification with selfie/liveness checks as fallback option
+- **What it does**:
+  - Government-issued ID verification (document upload)
+  - Biometric liveness checks (selfie with face matching)
+  - Required for EU/UK merchants or when automated verification needs visual confirmation
+- **Note**: See [Stripe Identity Integration](../05-integrations/STRIPE_IDENTITY_VERIFICATION.md) for technical details
 
 ---
 
@@ -234,7 +238,7 @@ This data is required by Stripe and must be submitted when creating the Stripe a
 - **Ownership %**: If owner selected, percentage required (1-100)
 - **ToS**: Must be checked to proceed
 
-**Important**: We initially collect only the last 4 digits of SSN. If Stripe verification fails, the merchant will be prompted to provide the full 9-digit SSN through a secure form. Full SSN is also required when merchant reaches $500K lifetime processing volume.
+**Important**: We initially collect only the last 4 digits of SSN. If Stripe verification fails, the merchant will be prompted to provide the full 9-digit SSN through a secure form. If verification still cannot be completed automatically, merchants may be asked to complete document verification with Stripe Identity (photo ID upload + selfie). Full SSN is also required when merchant reaches $500K lifetime processing volume.
 
 ---
 
@@ -497,7 +501,7 @@ If verification fails or requires additional information, merchants see clear gu
 | Address mismatch | "Address doesn't match the document provided" | Update address or upload different document |
 | DOB mismatch | "Date of birth doesn't match" | Correct DOB or upload government ID |
 | SSN verification failed (Last 4) | "We need your full Social Security Number to verify your identity" | Enter full 9-digit SSN (secure form) |
-| SSN verification failed (Full) | "We couldn't verify your identity automatically" | Upload government ID document (driver's license, passport) |
+| SSN verification failed (Full) | "We need to verify your identity with a photo ID" | Upload government ID via Stripe Identity (document + selfie verification) |
 | Unclear document | "Document image is unclear or incomplete" | Upload clearer photo |
 | Expired document | "Please provide a current, unexpired document" | Upload valid, unexpired document |
 | EIN verification failed | "We couldn't verify your business entity" | Upload IRS Letter 147C or Articles of Incorporation |
@@ -585,7 +589,8 @@ If verification fails or requires additional information, merchants see clear gu
 
 **Technical Integration References**:
 - [Stripe Payment Setup Flow](../05-integrations/STRIPE_PAYMENT_SETUP_FLOW.md) - Complete Stripe Connect Custom account implementation
-- [Trulioo KYC/KYB Integration](../05-integrations/TRUEBIZ_VERIFICATION_API.md) - Identity verification provider integration
+- [Trulioo KYC/KYB Integration](../05-integrations/TRUEBIZ_VERIFICATION_API.md) - Primary identity verification provider
+- [Stripe Identity Verification](../05-integrations/STRIPE_IDENTITY_VERIFICATION.md) - Fallback verification with document upload and liveness checks
 - [Stripe Custom Accounts Documentation](https://docs.stripe.com/connect/custom-accounts) - Official Stripe docs
 - [Required Verification Information](https://docs.stripe.com/connect/required-verification-information) - Stripe data requirements
 - [Handling API Verification](https://docs.stripe.com/connect/handling-api-verification) - Stripe verification processing
