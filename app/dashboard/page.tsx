@@ -14,6 +14,14 @@ import { Loader2 } from 'lucide-react';
 // Default checklist tasks
 const getDefaultChecklistTasks = (): ChecklistTask[] => [
   {
+    id: 'payment-setup',
+    title: 'Payment Setup',
+    description: 'Set up payment processing and connect your bank account',
+    status: 'not-started',
+    required: true,
+    route: '/dashboard/payments',
+  },
+  {
     id: 'business-verification',
     title: 'Business Verification',
     description: 'Verify your identity to start taking payments with Lightspeed',
@@ -38,14 +46,6 @@ const getDefaultChecklistTasks = (): ChecklistTask[] => [
     route: '/dashboard/hardware',
   },
   {
-    id: 'payment-setup',
-    title: 'Payment Setup',
-    description: 'Set up payment processing and connect your bank account',
-    status: 'not-started',
-    required: true,
-    route: '/dashboard/payments',
-  },
-  {
     id: 'team-setup',
     title: 'Team Setup',
     description: 'Add team members and configure permissions',
@@ -67,35 +67,35 @@ const getDefaultChecklistTasks = (): ChecklistTask[] => [
 function calculateTaskStatus(merchant: StoredMerchant): ChecklistTask[] {
   const tasks = getDefaultChecklistTasks();
 
-  // Business Verification - based on KYB status
-  if (merchant.kybStatus === 'approved') {
+  // Payment Setup - based on bankAccountData and KYC status (now index 0)
+  if (merchant.bankAccountData?.accountNumber && merchant.kycStatus === 'approved') {
     tasks[0].status = 'completed';
-  } else if (merchant.kybStatus === 'pending' || merchant.kybStatus === 'review') {
+  } else if (merchant.bankAccountData || merchant.kycStatus === 'pending') {
     tasks[0].status = 'in-progress';
   }
 
-  // POS Configuration - based on posSetupData
-  if (merchant.posSetupData?.locations && merchant.posSetupData?.registersPerLocation) {
+  // Business Verification - based on KYB status (now index 1)
+  if (merchant.kybStatus === 'approved') {
     tasks[1].status = 'completed';
-  } else if (merchant.posSetupData) {
+  } else if (merchant.kybStatus === 'pending' || merchant.kybStatus === 'review') {
     tasks[1].status = 'in-progress';
   }
 
-  // Hardware Selection - based on checkoutData
-  if (merchant.checkoutData?.paymentMethod || merchant.posSetupData?.existingHardware?.hasExisting) {
+  // POS Configuration - based on posSetupData (now index 2)
+  if (merchant.posSetupData?.locations && merchant.posSetupData?.registersPerLocation) {
     tasks[2].status = 'completed';
-  } else if (merchant.checkoutData) {
+  } else if (merchant.posSetupData) {
     tasks[2].status = 'in-progress';
   }
 
-  // Payment Setup - based on bankAccountData and KYC status
-  if (merchant.bankAccountData?.accountNumber && merchant.kycStatus === 'approved') {
+  // Hardware Selection - based on checkoutData (now index 3)
+  if (merchant.checkoutData?.paymentMethod || merchant.posSetupData?.existingHardware?.hasExisting) {
     tasks[3].status = 'completed';
-  } else if (merchant.bankAccountData || merchant.kycStatus === 'pending') {
+  } else if (merchant.checkoutData) {
     tasks[3].status = 'in-progress';
   }
 
-  // Team Setup - check setupTasks for team-related tasks
+  // Team Setup - check setupTasks for team-related tasks (now index 4)
   const teamTask = merchant.setupTasks?.find(t => t.id.includes('team'));
   if (teamTask?.completed) {
     tasks[4].status = 'completed';
@@ -103,7 +103,7 @@ function calculateTaskStatus(merchant: StoredMerchant): ChecklistTask[] {
     tasks[4].status = 'in-progress';
   }
 
-  // Import Data - check setupTasks for import-related tasks
+  // Import Data - check setupTasks for import-related tasks (now index 5)
   const importTask = merchant.setupTasks?.find(t => t.id.includes('import') || t.id.includes('data'));
   if (importTask?.completed) {
     tasks[5].status = 'completed';
