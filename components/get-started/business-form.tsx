@@ -19,6 +19,7 @@ import { BUSINESS_CATEGORIES, REVENUE_RANGES, US_STATES } from '@/lib/merchant-m
 
 export interface BusinessFormData {
   businessCategory: string;
+  businessWebsite: string; // For future TrueBiz verification
   businessAddress: {
     street: string;
     city: string;
@@ -38,6 +39,7 @@ interface BusinessFormProps {
 export function BusinessForm({ onSubmit, onBack, initialData }: BusinessFormProps) {
   const [formData, setFormData] = useState<BusinessFormData>({
     businessCategory: initialData?.businessCategory || '',
+    businessWebsite: initialData?.businessWebsite || '',
     businessAddress: initialData?.businessAddress || {
       street: '',
       city: '',
@@ -87,6 +89,17 @@ export function BusinessForm({ onSubmit, onBack, initialData }: BusinessFormProp
       newErrors.businessCategory = 'Business category is required';
     }
 
+    // Website URL validation (required for TrueBiz verification)
+    if (!formData.businessWebsite.trim()) {
+      newErrors.businessWebsite = 'Business website is required';
+    } else {
+      // Basic URL validation
+      const urlPattern = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
+      if (!urlPattern.test(formData.businessWebsite)) {
+        newErrors.businessWebsite = 'Please enter a valid website URL';
+      }
+    }
+
     if (!formData.businessAddress.street.trim()) {
       newErrors['businessAddress.street'] = 'Street address is required';
     }
@@ -116,6 +129,7 @@ export function BusinessForm({ onSubmit, onBack, initialData }: BusinessFormProp
     setErrors(newErrors);
     setTouched({
       businessCategory: true,
+      businessWebsite: true,
       'businessAddress.street': true,
       'businessAddress.city': true,
       'businessAddress.state': true,
@@ -187,6 +201,36 @@ export function BusinessForm({ onSubmit, onBack, initialData }: BusinessFormProp
                     className="text-sm text-red-500"
                   >
                     {errors.businessCategory}
+                  </motion.p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="businessWebsite" className="text-base">
+                  Business Website <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="businessWebsite"
+                  type="url"
+                  value={formData.businessWebsite}
+                  onChange={(e) => updateField('businessWebsite', e.target.value)}
+                  onBlur={() => handleBlur('businessWebsite')}
+                  className={cn(
+                    'h-11 text-base',
+                    touched.businessWebsite && errors.businessWebsite && 'border-red-500 focus-visible:ring-red-500'
+                  )}
+                  placeholder="https://yourbusiness.com"
+                />
+                <p className="text-sm text-muted-foreground">
+                  We'll use this to verify your business information
+                </p>
+                {touched.businessWebsite && errors.businessWebsite && (
+                  <motion.p
+                    initial={{ opacity: 0, y: -5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-sm text-red-500"
+                  >
+                    {errors.businessWebsite}
                   </motion.p>
                 )}
               </div>
