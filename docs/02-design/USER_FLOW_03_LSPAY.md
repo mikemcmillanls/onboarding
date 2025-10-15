@@ -560,18 +560,25 @@ If verification fails or requires additional information, merchants see clear gu
 
 ## Related Documentation
 
+**Previous Flows**:
+- [User Flow 1: Signup and Account Provisioning](./USER_FLOW_01_SIGNUP_AND_PROVISIONING.md) - Signup, business data collection, and cohort assignment
+- [User Flow 2: Dashboard Experience](./USER_FLOW_02_DASHBOARD.md) - Dashboard Task 1 initiates this verification flow
+
 **Next Flow**:
-- [User Flow 2: Dashboard](./USER_FLOW_02_DASHBOARD.md) - Dashboard overview and task management
+- [User Flow 4: Subscription and Hardware Purchase](./USER_FLOW_04_PURCHASE.md) - Purchase flow after verification data is collected
 
-**Previous Flow**:
-- [User Flow 1: Signup](./USER_FLOW_01_SIGNUP_AND_PROVISIONING.md) - Signup and cohort assignment
+**Related Dashboard Tasks**:
+- [Task 1: Verify Your Identity](./USER_FLOW_02_DASHBOARD.md#1-verify-your-identity) - Dashboard entry point for this verification flow
+- [Task 2: Configure Your POS](./USER_FLOW_02_DASHBOARD.md#2-configure-your-pos) - Required before purchase
+- [Task 3: Connect Bank for Payouts](./USER_FLOW_02_DASHBOARD.md#3-connect-bank-for-payouts) - Optional, for receiving payouts
 
-**Technical References** (for engineering team):
-- [Stripe Custom Accounts Documentation](https://docs.stripe.com/connect/custom-accounts)
-- [Required Verification Information](https://docs.stripe.com/connect/required-verification-information)
-- [Handling API Verification](https://docs.stripe.com/connect/handling-api-verification)
-- [Testing Verification](https://docs.stripe.com/connect/testing-verification)
-- [Trulioo Integration Documentation](../05-integrations/TRUEBIZ_INTEGRATION_ANALYSIS.md)
+**Technical Integration References**:
+- [Stripe Payment Setup Flow](../05-integrations/STRIPE_PAYMENT_SETUP_FLOW.md) - Complete Stripe Connect Custom account implementation
+- [Trulioo KYC/KYB Integration](../05-integrations/TRUEBIZ_VERIFICATION_API.md) - Identity verification provider integration
+- [Stripe Custom Accounts Documentation](https://docs.stripe.com/connect/custom-accounts) - Official Stripe docs
+- [Required Verification Information](https://docs.stripe.com/connect/required-verification-information) - Stripe data requirements
+- [Handling API Verification](https://docs.stripe.com/connect/handling-api-verification) - Stripe verification processing
+- [Testing Verification](https://docs.stripe.com/connect/testing-verification) - Test mode verification flows
 
 ---
 

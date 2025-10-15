@@ -964,8 +964,17 @@ Funds accumulate in Stripe balance
 
 ## Related Documentation
 
-**Previous Step**:
-- [User Flow 1: Signup and Account Provisioning](./USER_FLOW_01_SIGNUP_AND_PROVISIONING.md)
+**Previous Flow**:
+- [User Flow 1: Signup and Account Provisioning](./USER_FLOW_01_SIGNUP_AND_PROVISIONING.md) - Account creation and cohort assignment before landing on dashboard
 
-**Payment Activation Details**:
-- [User Flow 3: LSPAY Activation](./USER_FLOW_03_LSPAY.md) - Complete data requirements for payment activation
+**Next Flows**:
+- [User Flow 3: Identity Verification (LSPAY)](./USER_FLOW_03_LSPAY.md) - Detailed data requirements and UI for Task 1 (Verify Identity)
+- [User Flow 4: Subscription and Hardware Purchase](./USER_FLOW_04_PURCHASE.md) - Complete purchase experience after completing required tasks
+
+**Technical Integration Details**:
+- [Stripe Payment Setup Flow](../05-integrations/STRIPE_PAYMENT_SETUP_FLOW.md) - Stripe Connect account creation timing and implementation
+- [Trulioo KYC/KYB Integration](../05-integrations/TRULIOO_VERIFICATION_API.md) - Identity verification provider integration
+
+**Component References**:
+- `components/dashboard/checklist-card.tsx` - Task card component implementation (see lines 16-109)
+- `components/dashboard/` - Dashboard task-specific components

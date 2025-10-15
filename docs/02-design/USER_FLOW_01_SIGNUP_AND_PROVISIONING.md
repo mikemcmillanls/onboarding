@@ -487,15 +487,20 @@ If APPROVED:
 
 ## Related Documentation
 
-**Next Steps**:
-- [User Flow 2: Dashboard and Payment Setup](./USER_FLOW_02_DASHBOARD_AND_PAYMENTS.md) - Dashboard overview and payment activation
+**Next Flow**:
+- [User Flow 2: Dashboard Experience](./USER_FLOW_02_DASHBOARD.md) - Dashboard tasks and setup after signup
 
-**Technical Details**:
-- [TrueBiz Integration Analysis](../05-integrations/TRUEBIZ_INTEGRATION_ANALYSIS.md)
-- [TrueBiz Verification API](../05-integrations/TRUEBIZ_VERIFICATION_API.md)
-- [Component Guide](../03-implementation/COMPONENT_GUIDE.md)
+**Subsequent Flows**:
+- [User Flow 3: Identity Verification (LSPAY)](./USER_FLOW_03_LSPAY.md) - KYC/KYB verification data requirements
+- [User Flow 4: Subscription and Hardware Purchase](./USER_FLOW_04_PURCHASE.md) - Complete purchase flow
+
+**Technical Integration Details**:
+- [TrueBiz Integration Analysis](../05-integrations/TRUEBIZ_INTEGRATION_ANALYSIS.md) - Business data enhancement implementation
+- [TrueBiz Verification API](../05-integrations/TRUEBIZ_VERIFICATION_API.md) - API reference and data requirements
+- [Stripe Payment Setup Flow](../05-integrations/STRIPE_PAYMENT_SETUP_FLOW.md) - Complete Stripe Connect integration
+- [Component Guide](../03-implementation/COMPONENT_GUIDE.md) - Frontend component specifications
 
 **Design Specifications**:
-- [Design Specifications](./DESIGN_SPECIFICATIONS.md)
-- [UI Copy Reference](./UI_COPY.md)
+- [Design Specifications](./DESIGN_SPECIFICATIONS.md) - Visual design and UI patterns
+- [UI Copy Reference](./UI_COPY.md) - Microcopy and messaging guidelines
 
