@@ -108,6 +108,7 @@ The signup flow uses a 2-page wizard pattern with client-side state management. 
 
 **Data Collected**:
 - Business category (dropdown, 15+ options)
+- **Business website URL** (text input, URL format) - *For future TrueBiz verification*
 - Business address:
   - Street address
   - City
@@ -118,12 +119,14 @@ The signup flow uses a 2-page wizard pattern with client-side state management. 
 
 **Validation Rules**:
 - All fields required
+- Business website: Must be valid URL format (supports http/https, with or without www)
 - ZIP code: Must match format `^\d{5}(-\d{4})?$`
 - Number of locations: Must be ≥ 1
 
 **User Experience**:
 - Sectioned form with clear groupings:
   - Business Category
+  - Business Website (with helper text: "We'll use this to verify your business information")
   - Business Address (4 fields)
   - Business Size (revenue + locations)
 - Real-time validation on blur
@@ -489,6 +492,7 @@ Individual Task Pages Read/Write
   email: string;
   password: string;
   businessCategory: string;
+  businessWebsite: string;  // For future TrueBiz verification
   businessAddress: {
     street: string;
     city: string;
@@ -816,6 +820,6 @@ For implementation details, see [COMPONENT_GUIDE.md](../03-implementation/COMPON
 
 ---
 
-**Last Updated**: October 2025
-**Version**: Current State (Prototype)
+**Last Updated**: January 2025
+**Version**: Current State (Prototype + TrueBiz Integration Planning)
 **Maintainer**: Product & Engineering Teams

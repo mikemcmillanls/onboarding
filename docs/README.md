@@ -107,6 +107,14 @@ Reusable design system reference.
 **Files:**
 - `DESIGN_SYSTEM.md` - Colors, typography, spacing, components
 
+### 05-integrations/
+Third-party API integration documentation.
+
+**Files:**
+- `STRIPE_PAYMENT_SETUP_FLOW.md` - Stripe Connect integration guide for payment processing
+- `TRUEBIZ_VERIFICATION_API.md` - TrueBiz API reference for business verification (planned)
+- `TRUEBIZ_INTEGRATION_ANALYSIS.md` - Complete analysis and implementation plan for TrueBiz integration at signup
+
 ---
 
 ## Common Tasks
@@ -267,6 +275,6 @@ Each topic has **one authoritative document**:
 
 ---
 
-**Last Updated**: October 2025
-**Total Documentation Files**: 8
-**Documentation Coverage**: Current product state only
+**Last Updated**: January 2025
+**Total Documentation Files**: 13
+**Documentation Coverage**: Current product state + planned integrations

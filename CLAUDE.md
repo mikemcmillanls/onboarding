@@ -52,6 +52,8 @@ The system integrates with:
 - Payments Onboarding Service (KYB/KYC flows)
 - Hardware ordering/shipping system
 - Billing/payment processing
+- **TrueBiz API** (business verification - planned)
+- **Stripe Connect** (payment processing setup)
 
 ### Critical Flow Requirements
 
@@ -123,7 +125,10 @@ Active Merchant
 
 Refer to `merchant_onboarding_prd.md` Appendix for complete data collection summary. Key points:
 
-- **Step 2**: Account creation (name, email, phone, business category, annual revenue)
+- **Account Creation (/get-started)**:
+  - Page 1: Name, email, password, business name, phone
+  - Page 2: Business category, **business website URL**, business address, annual revenue, number of locations
+  - Business website is required for future TrueBiz verification integration
 - **Step 3**: KYB data (business structure, legal name, EIN, registered address)
 - **Step 7**: KYC data (business representative + all owners with SSN, DOB)
 - **Step 9**: Payout bank account (triggers payout enablement after verification)
@@ -139,6 +144,15 @@ Claude Code has access to specialized agents for complex tasks. Use these agents
 - **product-lead-advisor**: Strategic product guidance, feature prioritization, roadmap decisions, market analysis
 - **tech-lead-orchestrator**: High-level technical coordination across frontend, backend, and API work
 - **meta-agent**: Generate new Claude Code sub-agent configurations
+- **stripe-connect-expert**: Stripe Connect platform integrations, payment onboarding, KYB/KYC, compliance, webhooks
+
+## Integration Documentation
+
+Detailed integration documentation is available in `/docs/05-integrations/`:
+
+- **STRIPE_PAYMENT_SETUP_FLOW.md**: Complete Stripe Connect integration guide for payment processing setup
+- **TRUEBIZ_VERIFICATION_API.md**: TrueBiz API reference for business verification (planned integration)
+- **TRUEBIZ_INTEGRATION_ANALYSIS.md**: Comprehensive analysis of adding TrueBiz verification at signup, including ROI analysis and implementation plan
 
 ## Open Questions
 

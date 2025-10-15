@@ -46,6 +46,8 @@ This prototype demonstrates the complete merchant journey with interactive UI, s
 - Next actions panel with critical warnings
 - Smooth animations and transitions
 - Fully responsive design
+- Business verification field (prepared for TrueBiz integration)
+- Integration planning for Stripe Connect and TrueBiz APIs
 
 ## Tech Stack
 
@@ -156,6 +158,20 @@ Each step tracks:
 npm run build
 npm start
 ```
+
+## Planned Integrations
+
+### TrueBiz Business Verification (Planned)
+- Verify business legitimacy at signup
+- Fraud prevention and risk scoring
+- Business enrichment data (industry, size, metrics)
+- See `/docs/05-integrations/TRUEBIZ_INTEGRATION_ANALYSIS.md` for complete implementation plan
+
+### Stripe Connect (Planned)
+- Payment processing setup
+- KYB/KYC verification
+- Payout configuration
+- See `/docs/05-integrations/STRIPE_PAYMENT_SETUP_FLOW.md` for implementation guide
 
 ## Future Enhancements
 
