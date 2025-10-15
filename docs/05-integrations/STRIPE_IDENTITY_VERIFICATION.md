@@ -274,7 +274,7 @@ async function createIdentityVerificationSession(
       lightspeed_account_id: merchant.lightspeedAccountId,
       stripe_account_id: stripeAccountId,
       verification_tier: 'tier_3_identity',
-      reason: reason,  // 'trulioo_failed' | 'country_regulation' | 'high_risk'
+      reason: reason,  // 'trulioo_failed' OR 'country_regulation' OR 'high_risk'
       previous_attempts: '2'  // Track retry count
     },
 
