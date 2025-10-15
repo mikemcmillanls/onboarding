@@ -50,16 +50,26 @@ export function Step3Checkout({ onComplete, onBack, pricing, businessAddress }: 
   };
 
   const updateNestedField = (section: string, subsection: string, field: string, value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      [section]: {
-        ...prev[section as keyof CheckoutData],
-        [subsection]: {
-          ...(prev[section as keyof CheckoutData] as Record<string, unknown>)?.[subsection],
-          [field]: value,
+    setFormData(prev => {
+      const sectionData = prev[section as keyof CheckoutData];
+      const subsectionData = sectionData && typeof sectionData === 'object'
+        ? (sectionData as Record<string, unknown>)[subsection]
+        : undefined;
+      const existingSubsection = subsectionData && typeof subsectionData === 'object'
+        ? subsectionData as Record<string, unknown>
+        : {};
+
+      return {
+        ...prev,
+        [section]: {
+          ...sectionData,
+          [subsection]: {
+            ...existingSubsection,
+            [field]: value,
+          },
         },
-      },
-    }));
+      };
+    });
   };
 
   const handleSubmit = async () => {
