@@ -178,15 +178,15 @@ This flow uses multiple verification providers at different stages:
 
 | Field | Source | Pre-filled Later? | Why Required |
 |-------|--------|-------------------|--------------|
-| Business Name | Signup form | Yes → Step 2 | Required for Stripe company account |
-| Email | Signup form | Yes → Step 1 | Primary contact and account identifier |
-| Business Phone | Signup form | Yes → Step 2 | Required for payment processing |
-| Business Website | Signup form | Yes → Step 2 | Required for card-not-present transactions |
-| Business Structure | Signup form | Yes → Step 2 | Determines verification requirements |
-| Business Address | Signup form | Yes → Step 2 | Required for legal entity verification |
-| Business Category | Signup form | Yes → Step 2 | Determines MCC code (processing rates) |
-| Annual Revenue | Signup form | No (cohort only) | Cohort assignment |
-| Number of Locations | Signup form | No (config only) | Configuration planning |
+| Business Name | Signup form | Yes → Step 2 (Legal Business Name) | Required for Stripe company account |
+| Email | Signup form | Yes → Step 1 (Email) | Primary contact and account identifier |
+| Business Phone | Signup form | Yes → Step 1 (Personal Phone default), Step 2 (Business Phone + Support Phone) | Required for payment processing and customer support |
+| Business Website | Signup form | Yes → Step 2 (Business Website) | Required for card-not-present transactions |
+| Business Structure | Signup form | Yes → Step 2 (Business Structure) | Determines verification requirements (must be confirmed) |
+| Business Address | Signup form | Yes → Step 2 (Street, City, State, ZIP) | Required for legal entity verification |
+| Business Category | Signup form | Yes → Step 2 (Business Category) | Determines MCC code (processing rates) |
+| Annual Revenue | Signup form | No (cohort assignment only) | Cohort assignment |
+| Number of Locations | Signup form | No (configuration only) | Configuration planning |
 
 ---
 
@@ -258,7 +258,7 @@ Complete Tasks 1-2 to unlock purchase
 | First Name | No | Enter | Federal KYC requirement (Bank Secrecy Act) |
 | Last Name | No | Enter | Federal KYC requirement |
 | Email | Yes (from signup) | Confirm/Edit | Contact for verification issues |
-| Phone | Yes (from signup) | Confirm/Edit | Contact for verification issues |
+| Your Personal Phone | Yes (from business phone) | Confirm/Edit | Your personal contact number for verification issues (pre-filled with business phone for convenience) |
 | Date of Birth | No | Enter (MM/DD/YYYY) | Age verification (18+) and identity check |
 | **Home Address** |
 | Street Address | No | Enter | Identity verification via credit bureaus |
@@ -268,8 +268,8 @@ Complete Tasks 1-2 to unlock purchase
 | **Identity Verification** |
 | SSN Last 4 | No | Enter (4 digits) | Identity verification (full SSN not required unless verification fails) |
 | **Role in Business** |
-| Title/Role | No | Select dropdown | Determines authority level |
-|  |  | Options: Business Owner, CEO, CFO, Other | |
+| Title/Role | No | Select dropdown | Determines authority level and relationship to business |
+|  |  | Options: Business Owner, CEO, CFO, President, Partner | Federal law requires representative must be an owner OR executive |
 | Ownership % | Conditional | Enter if owner | Required for owners, determines beneficial owner status |
 | **Terms & Agreements** |
 | ToS Acceptance | No | Check box + timestamp | Legal requirement for Stripe processing |
@@ -294,6 +294,8 @@ Complete Tasks 1-2 to unlock purchase
 - **Ownership %**: If owner selected, percentage required (1-100)
 - **ToS**: Must be checked to proceed
 
+**Important**: We initially collect only the last 4 digits of SSN. If Stripe verification fails, the merchant will be prompted to provide the full 9-digit SSN through a secure form. Full SSN is also required when merchant reaches $500K lifetime processing volume.
+
 ---
 
 #### What Happens After Submission
@@ -303,6 +305,12 @@ Complete Tasks 1-2 to unlock purchase
 3. **Task Status**: Changes from "Not Started" → "Completed"
 4. **Next Step**: Merchant can proceed to Task #2 (Business Entity Information)
 5. **No Verification Yet**: Trulioo identity verification runs AFTER purchase, not now
+
+**Backend Note - Representative Relationship Mapping**:
+When Stripe account is created during purchase, the Title/Role selection must be mapped to Stripe's relationship flags:
+- "Business Owner" or "Partner" → `relationship.owner = true` + `relationship.representative = true`
+- "CEO", "CFO", or "President" → `relationship.executive = true` + `relationship.representative = true`
+- At least one of `owner` or `executive` must be true (federal requirement)
 
 ---
 
@@ -341,6 +349,7 @@ Complete Tasks 1-2 to unlock purchase
 |  |  | Options: Sole Proprietorship, Single-Member LLC, Multi-Member LLC, Corporation, Partnership, Non-Profit | |
 | EIN | No | Enter (9 digits) | IRS business verification (not required for sole proprietors) |
 | Business Phone | Yes (from signup) | Confirm/Edit | Primary business contact |
+| Customer Support Phone | Yes (from business phone) | Confirm/Edit | Phone number for customer inquiries and disputes (required by Stripe for card payments) |
 | **Business Location** |
 | Street Address | Yes (from signup) | Confirm/Edit | Legal registered address |
 | City | Yes (from signup) | Confirm/Edit | Business verification |
@@ -377,7 +386,8 @@ The system shows helpful guidance based on selected structure:
 - **EIN**: Exactly 9 digits, numbers only (unless sole proprietor)
 - **Business Address**: Must be valid US address
 - **Website**: Valid URL format, or can enter "None" if no website
-- **Phone**: Valid US phone number (10 digits)
+- **Business Phone**: Valid US phone number (10 digits)
+- **Customer Support Phone**: Valid US phone number (10 digits), can be same as business phone
 - **Product Description**: Minimum 10 characters, describe what you sell/provide
 
 ---
@@ -734,9 +744,11 @@ If verification fails or requires additional information, merchants see clear gu
 | Name mismatch | "The name provided doesn't match our records" | Re-enter correct legal name |
 | Address mismatch | "Address doesn't match the document provided" | Update address or upload different document |
 | DOB mismatch | "Date of birth doesn't match" | Correct DOB or upload government ID |
-| SSN verification failed | "We couldn't verify your identity automatically" | Upload government ID document |
+| SSN verification failed (Last 4) | "We need your full Social Security Number to verify your identity" | Enter full 9-digit SSN (secure form) |
+| SSN verification failed (Full) | "We couldn't verify your identity automatically" | Upload government ID document (driver's license, passport) |
 | Unclear document | "Document image is unclear or incomplete" | Upload clearer photo |
 | Expired document | "Please provide a current, unexpired document" | Upload valid, unexpired document |
+| EIN verification failed | "We couldn't verify your business entity" | Upload IRS Letter 147C or Articles of Incorporation |
 
 ### Error Recovery Flow (Merchant Experience)
 
