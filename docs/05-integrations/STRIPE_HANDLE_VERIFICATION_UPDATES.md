@@ -85,6 +85,7 @@ When verification requirements change, you must collect updated information by a
 
 **Preview upcoming changes** before `current_deadline`:
 
+{% raw %}
 ```json
 {
   "id": "{{CONNECTED_ACCOUNT_ID}}",
@@ -105,6 +106,7 @@ When verification requirements change, you must collect updated information by a
   ...
 }
 ```
+{% endraw %}
 
 **Using Stripe Data (Sigma)**:
 - Retrieve `future_requirements` via [Sigma query](https://docs.stripe.com/stripe-data/query-connect-data#account-requirements)
@@ -183,13 +185,16 @@ After onboarding, inspect:
 
 **Example Check**:
 
+{% raw %}
 ```bash
 curl https://api.stripe.com/v1/accounts/{{CONNECTEDACCOUNT_ID}} \
   -u "<<YOUR_SECRET_KEY>>:"
 ```
+{% endraw %}
 
 **Successful Response**:
 
+{% raw %}
 ```json
 {
   "id": "{{CONNECTED_ACCOUNT_ID}}",
@@ -209,6 +214,7 @@ curl https://api.stripe.com/v1/accounts/{{CONNECTEDACCOUNT_ID}} \
   ...
 }
 ```
+{% endraw %}
 
 ---
 
@@ -294,6 +300,7 @@ Use one of these methods:
 
 **Example Account Link Creation**:
 
+{% raw %}
 ```bash
 curl https://api.stripe.com/v1/account_links \
   -u "<<YOUR_SECRET_KEY>>:" \
@@ -302,6 +309,7 @@ curl https://api.stripe.com/v1/account_links \
   -d return_url="https://yourdomain.com/return" \
   -d type=account_onboarding
 ```
+{% endraw %}
 
 #### 4. Remediation Links
 - Generate via Dashboard
@@ -437,6 +445,7 @@ curl https://api.stripe.com/v1/account_links \
 
 **Example** (Account Links):
 
+{% raw %}
 ```bash
 curl https://api.stripe.com/v1/account_links \
   -u "<<YOUR_SECRET_KEY>>:" \
@@ -444,6 +453,7 @@ curl https://api.stripe.com/v1/account_links \
   -d type=account_onboarding \
   -d "collection_options[future_requirements]"=include
 ```
+{% endraw %}
 
 ### 2. Regular Monitoring
 

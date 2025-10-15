@@ -74,6 +74,7 @@ The `errors` array contains:
 
 ### Example Requirements Hash
 
+{% raw %}
 ```json
 {
   "id": "{{CONNECTED_ACCOUNT_ID}}",
@@ -109,6 +110,7 @@ The `errors` array contains:
   }
 }
 ```
+{% endraw %}
 
 ### Handling Deadlines and Disabled Accounts
 
@@ -146,6 +148,7 @@ The `Account` object includes a [requirements.errors](https://docs.stripe.com/ap
 
 ### Example Errors Array
 
+{% raw %}
 ```json
 {
   "id": "{{CONNECTED_ACCOUNT_ID}}",
@@ -171,6 +174,7 @@ The `Account` object includes a [requirements.errors](https://docs.stripe.com/ap
   }
 }
 ```
+{% endraw %}
 
 If verification or validation is unsuccessful but no requirements are currently due, a webhook triggers indicating that required information is eventually due.
 
@@ -246,6 +250,7 @@ During the verification process, you might need to collect information about the
 
 To retrieve the status of verification information regarding an account's company, use the `Account` object's [company.verification](https://docs.stripe.com/api/accounts/object#account_object-company-verification) subhash:
 
+{% raw %}
 ```json
 {
   "id": "{{CONNECTED_ACCOUNT_ID}}",
@@ -257,6 +262,7 @@ To retrieve the status of verification information regarding an account's compan
   }
 }
 ```
+{% endraw %}
 
 You can look up the definition for each verification attribute on the `Account` object.
 
@@ -357,6 +363,7 @@ An account can have one or more [Person](https://docs.stripe.com/api/persons) ob
 
 [Create an Account Link](https://docs.stripe.com/connect/hosted-onboarding#create-account-link) using the connected account ID, and send the account to the `url` returned.
 
+{% raw %}
 ```bash
 curl https://api.stripe.com/v1/account_links \
   -u "<<YOUR_SECRET_KEY>>:" \
@@ -366,6 +373,7 @@ curl https://api.stripe.com/v1/account_links \
   -d type=account_onboarding \
   -d "collection_options[fields]"=currently_due
 ```
+{% endraw %}
 
 The account receives a prompt to complete the `proof_of_liveness` requirement, along with any other currently due requirements. Listen to the `account.updated` event sent to your webhook endpoint to be notified when the account completes requirements and updates their information. After the account completes the requirement, the account is redirected to the `return_url` specified.
 
@@ -377,6 +385,7 @@ When [creating an Account Session](https://docs.stripe.com/api/account_sessions/
 
 If you don't need to collect bank account information, disable `external_account_collection`. This typically applies to Connect platforms that want to use third-party external account collection providers.
 
+{% raw %}
 ```bash
 curl https://api.stripe.com/v1/account_sessions \
   -u "<<YOUR_SECRET_KEY>>:" \
@@ -384,6 +393,7 @@ curl https://api.stripe.com/v1/account_sessions \
   -d "components[account_onboarding][enabled]"=true \
   -d "components[account_onboarding][features][external_account_collection]"=false
 ```
+{% endraw %}
 
 After creating the Account Session and [initializing ConnectJS](https://docs.stripe.com/connect/get-started-connect-embedded-components#account-sessions), you can render the Account onboarding component in the front end:
 
@@ -450,6 +460,7 @@ To upload a file, use the [Create File](https://docs.stripe.com/api/files/create
 Pass the file data in the `file` parameter and set the [purpose](https://docs.stripe.com/api/files/create#create_file-purpose) parameter according to the `Account` or `Person` object that will hold the document.
 
 **Example**:
+{% raw %}
 ```bash
 curl https://files.stripe.com/v1/files \
   -u <<YOUR_SECRET_KEY>>: \
@@ -457,9 +468,11 @@ curl https://files.stripe.com/v1/files \
   -F "purpose"="identity_document" \
   -F "file"="@/path/to/a/file"
 ```
+{% endraw %}
 
 This request uploads the file and returns a token:
 
+{% raw %}
 ```json
 {
   "id": "{{FILE_ID}}",
@@ -467,6 +480,7 @@ This request uploads the file and returns a token:
   "size": 4908
 }
 ```
+{% endraw %}
 
 Use the token's `id` value to attach the file to a connected account for identity verification.
 
@@ -475,18 +489,22 @@ Use the token's `id` value to attach the file to a connected account for identit
 After you upload the file and receive a representative token, update the `Account` or `Person` object and provide the file ID in the appropriate parameter.
 
 **Example for ID document**:
+{% raw %}
 ```bash
 curl https://api.stripe.com/v1/accounts/{{CONNECTEDACCOUNT_ID}}/persons/{{PERSON_ID}} \
   -u "<<YOUR_SECRET_KEY>>:" \
   -d "verification[document][front]"="{{FILE_ID}}"
 ```
+{% endraw %}
 
 **Example for company document**:
+{% raw %}
 ```bash
 curl https://api.stripe.com/v1/accounts/{{CONNECTEDACCOUNT_ID}} \
   -u "<<YOUR_SECRET_KEY>>:" \
   -d "company[verification][document][front]"="{{FILE_ID}}"
 ```
+{% endraw %}
 
 This update changes `verification.status` to `pending`. If an additional person needs to be verified, use the [Persons](https://docs.stripe.com/api/persons) API to update them.
 
@@ -508,6 +526,7 @@ You can use [Stripe Identity](https://docs.stripe.com/identity) to fulfill a `pe
 
 [Create a VerificationSession](https://docs.stripe.com/api/identity/verification_sessions/create). Specify the `related_person` parameter to associate the collected verification data with the `Person` object requiring the `document`.
 
+{% raw %}
 ```bash
 curl https://api.stripe.com/v1/identity/verification_sessions \
   -u "<<YOUR_SECRET_KEY>>:" \
@@ -515,6 +534,7 @@ curl https://api.stripe.com/v1/identity/verification_sessions \
   -d "related_person[account]"="{{CONNECTEDACCOUNT_ID}}" \
   -d "related_person[person]"="{{PERSON_ID}}"
 ```
+{% endraw %}
 
 After you create the VerificationSession, use the returned `client_secret` to [show the Identity modal to the user](https://docs.stripe.com/identity/verify-identity-documents?platform=web&type=modal#show-modal) or redirect the user to the `url`. Verification completion automatically updates the account.
 
@@ -535,6 +555,7 @@ Stripe reports risk and compliance requirements in the [accounts.requirements](h
 
 ### Example Risk Requirement
 
+{% raw %}
 ```json
 {
   "id": "{{CONNECTED_ACCOUNT_ID}}",
@@ -548,9 +569,11 @@ Stripe reports risk and compliance requirements in the [accounts.requirements](h
   }
 }
 ```
+{% endraw %}
 
 After satisfying a resolution path, the value of the requirement's resolution path might change to `support` and the requirement also appears in the `pending_verification` section of the requirements hash. Stripe verifies the submitted information and either dismisses the requirement as resolved or posts a new currently due requirement.
 
+{% raw %}
 ```json
 {
   "id": "{{CONNECTED_ACCOUNT_ID}}",
@@ -564,6 +587,7 @@ After satisfying a resolution path, the value of the requirement's resolution pa
   }
 }
 ```
+{% endraw %}
 
 ### Remediation Methods
 
