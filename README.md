@@ -198,7 +198,12 @@ Comprehensive documentation is available in the `/docs` directory:
 - **[Architecture](./docs/03-implementation/ARCHITECTURE.md)** - Technical architecture
 - **[Design System](./docs/04-reference/DESIGN_SYSTEM.md)** - Colors, typography, components
 
-**Total Documentation**: 9 lean files focused on current product state
+**User Flow Documentation**:
+- **[Signup & Provisioning](./docs/02-design/USER_FLOW_01_SIGNUP_AND_PROVISIONING.md)** - Marketing → account creation
+- **[Dashboard & Payments](./docs/02-design/USER_FLOW_02_DASHBOARD_AND_PAYMENTS.md)** - Dashboard tasks → payment activation
+- **[Additional Setup](./docs/02-design/USER_FLOW_03_ADDITIONAL_SETUP.md)** - Optional tasks + technical implementation
+
+**Total Documentation**: 15 files focused on current product state + planned integrations
 
 ## License
 
@@ -207,4 +212,4 @@ Copyright Lightspeed Commerce Inc.
 ---
 
 **Built with**: Next.js 15.5.4, TypeScript, Tailwind CSS 4, shadcn/ui, Framer Motion
-**Last Updated**: October 2025
+**Last Updated**: January 2025

@@ -146,15 +146,32 @@ Claude Code has access to specialized agents for complex tasks. Use these agents
 - **meta-agent**: Generate new Claude Code sub-agent configurations
 - **stripe-connect-expert**: Stripe Connect platform integrations, payment onboarding, KYB/KYC, compliance, webhooks
 
+## User Flow Documentation
+
+User flow documentation is organized in `/docs/02-design/` by journey stage:
+
+- **USER_FLOW_01_SIGNUP_AND_PROVISIONING.md**: Marketing website → signup → TrueBiz verification → account creation
+- **USER_FLOW_02_DASHBOARD_AND_PAYMENTS.md**: Dashboard tasks → payment data collection → Stripe activation timeline
+- **USER_FLOW_03_ADDITIONAL_SETUP.md**: Optional tasks (hardware, data import, team setup) + technical implementation
+
+**Critical Payment Flow Timing**:
+- Dashboard tasks (Tasks 1-2) **collect** verification data and POS config
+- Data is stored locally, **NO Stripe Connect account created yet**
+- Stripe Connect account is created **during purchase** (when merchant completes hardware/software purchase)
+- Payment processing activates 1-2 days **after purchase**
+- Bank account connection is **optional** and only required for payouts (money out), not payment processing (money in)
+
 ## Integration Documentation
 
 Detailed integration documentation is available in `/docs/05-integrations/`:
 
-- **PAYMENT_FLOW_OPTIMIZATION.md**: **PRIMARY REFERENCE** for payment flow optimization strategy across speed-to-transact, risk underwriting, merchant experience, segment-specific flows, and cost optimization (Stripe-compliant)
-- **STRIPE_PAYMENT_SETUP_FLOW.md**: Complete Stripe Connect integration guide for payment processing setup
+- **STRIPE_PAYMENT_SETUP_FLOW.md**: **PRIMARY REFERENCE** - Complete Stripe Connect integration guide for payment processing setup
 - **STRIPE_IDENTITY_VS_TRULIOO_ANALYSIS.md**: Analysis comparing Stripe Identity vs third-party verification providers (Trulioo, TrueBiz)
+- **STRIPE_VERIFICATION_REQUIREMENTS.md**: Detailed Stripe Connect verification requirements and thresholds
+- **STRIPE_HANDLE_VERIFICATION_API.md**: API implementation guide for handling Stripe verification workflows
 - **TRUEBIZ_VERIFICATION_API.md**: TrueBiz API reference for business verification (planned integration)
 - **TRUEBIZ_INTEGRATION_ANALYSIS.md**: Comprehensive analysis of adding TrueBiz verification at signup, including ROI analysis and implementation plan
+- **STRIPE_TRULIOO_ANALYSIS_VALIDATION_REPORT.md**: Validation of Stripe analysis claims against official documentation
 
 ## Open Questions
 
