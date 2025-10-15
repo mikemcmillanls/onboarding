@@ -289,26 +289,7 @@ Automatic cohort assignment based on business size:
 
 **Note**: Location count can override revenue-based cohort assignment
 
-### Cohort Experience Differences
-
-**Self-Serve**:
-- Fully automated dashboard experience
-- Standard support (chat, email)
-- No specialist assignment
-- Self-guided setup tasks
-
-**Assisted**:
-- Sales-guided with self-checkout option
-- Specialist banner on dashboard with "Schedule a call" option
-- Free IC support available
-- Can still complete setup independently
-
-**Managed**:
-- White-glove implementation with specialist introduction
-- Dedicated account manager assigned
-- Custom pricing negotiations
-- Scheduled onboarding sessions
-- Implementation package included
+**Dashboard Experience**: Each cohort sees a different dashboard experience with varying levels of support and specialist engagement. See [User Flow 2: Dashboard - Cohort Experiences](./USER_FLOW_02_DASHBOARD.md#cohort-specific-dashboard-experiences) for complete details on what each cohort sees.
 
 ---
 
@@ -337,6 +318,61 @@ Automatic cohort assignment based on business size:
    - User lands on `/dashboard`
    - Sees 6-task checklist
    - Can begin setup immediately
+
+---
+
+## First Dashboard Landing
+
+**Route**: `/dashboard`
+
+**When**: Immediately after signup completes and account is provisioned
+
+**Purpose**: Introduce merchant to their dashboard and guide them to start setup
+
+---
+
+### What Merchant Sees
+
+**Welcome Header**:
+```
+Welcome, [Business Name]!
+
+You're all set! Complete these tasks to start accepting payments.
+```
+
+**Progress Indicator**:
+```
+Setup Progress: 0 of 6 tasks completed
+```
+
+**Payment Activation Banner** (prominent, above task cards):
+```
+🎯 Ready to accept payments?
+
+Complete these 3 steps to activate payment processing:
+  1. Verify Your Identity (10-15 minutes)
+  2. Configure Your POS (2-3 minutes)
+  3. Complete Your Purchase
+
+After purchase, we'll activate payments in 1-2 days.
+You can add your bank account anytime to receive payouts.
+```
+
+**6 Task Cards** (see [User Flow 2](./USER_FLOW_02_DASHBOARD.md) for complete task details):
+
+1. ⭕ Verify Your Identity (Required - 10-15 min)
+2. ⭕ Configure Your POS (Required - 2-3 min)
+3. ⭕ Connect Bank for Payouts (Optional - 1-3 min)
+4. ⭕ Hardware Selection (Optional - 5-10 min)
+5. ⭕ Team Setup (Optional - 3-5 min)
+6. ⭕ Import Data (Optional - 10-30 min)
+
+**Cohort-Specific Elements**:
+- **Self-Serve**: Standard dashboard, no specialist banner
+- **Assisted**: "Want help? Schedule a call with your specialist" banner
+- **Managed**: "Your dedicated account manager: [Name, Photo, Contact]" card
+
+See [User Flow 2: Dashboard Experience](./USER_FLOW_02_DASHBOARD.md) for complete dashboard documentation.
 
 ---
 
