@@ -214,6 +214,14 @@ This document focuses on the **identity verification** portion of the merchant o
   [Link: View Stripe Connected Account Agreement]
 ```
 
+**Backend Note - ToS Acceptance Capture**:
+When merchant checks this box, the system must capture:
+- Acceptance timestamp (ISO 8601 format)
+- IP address of the user
+- User agent string (browser/device info)
+
+This data is required by Stripe and must be submitted when creating the Stripe account during purchase.
+
 ---
 
 #### Validation Rules
@@ -289,7 +297,7 @@ When Stripe account is created during purchase, the Title/Role selection must be
 | ZIP Code | Yes (from signup) | Confirm/Edit | Business verification |
 | **Business Description** |
 | Business Website | Yes (from signup) | Confirm/Edit | Required for card-not-present processing |
-| Product Description | No | Enter (textarea) | What you sell - Stripe uses for risk assessment |
+| Product Description | No | Enter (textarea) | What you sell - Stripe uses for risk assessment. **REQUIRED if no business website** (at least one must be provided) |
 | Business Category | Yes (from signup) | Confirm/Edit | Determines processing rates (MCC code) |
 
 ---
@@ -317,10 +325,13 @@ The system shows helpful guidance based on selected structure:
 
 - **EIN**: Exactly 9 digits, numbers only (unless sole proprietor)
 - **Business Address**: Must be valid US address
-- **Website**: Valid URL format, or can enter "None" if no website
+- **Business Website**: Valid URL format (http/https), OR can enter "None" if no website
+- **Product Description**: Minimum 10 characters, describe what you sell/provide
+- **Website OR Product Description**: At least one MUST be provided (Stripe requirement for card processing)
+  - If website provided → Product description optional but recommended
+  - If no website → Product description REQUIRED
 - **Business Phone**: Valid US phone number (10 digits)
 - **Customer Support Phone**: Valid US phone number (10 digits), can be same as business phone
-- **Product Description**: Minimum 10 characters, describe what you sell/provide
 
 ---
 
