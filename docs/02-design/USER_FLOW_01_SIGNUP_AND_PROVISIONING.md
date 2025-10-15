@@ -44,13 +44,6 @@ This document describes the end-to-end signup journey from first website visit t
 - Trust signals (security badges, testimonials)
 - Clear CTAs throughout
 
-### Technical Details
-
-- Built with Next.js App Router
-- Framer Motion animations for entrance effects
-- Responsive design (mobile-first)
-- shadcn/ui components for buttons and cards
-
 ---
 
 ## 2-Page Signup Flow
@@ -90,25 +83,24 @@ The signup flow uses a 2-page wizard pattern with client-side state management. 
   - "Setup in Minutes"
   - "No Long-term Contract"
 - "Already have an account? Sign in" link
-
-**Flow**:
-1. User fills out form fields
-2. Validation runs on blur for each field
-3. User checks terms agreement checkbox
-4. User clicks "Create account" button
-5. All fields validated
-6. If valid → Proceed to Page 2
-7. If invalid → Show errors, focus first error
+- On successful validation → Proceed to Page 2
 
 ---
 
-### Page 2: Business Information with TrueBiz Verification
+### Page 2: Business Information with TrueBiz Data Enhancement
 
 **Component**: `BusinessForm` (`components/get-started/business-form.tsx`)
 
 **Data Collected**:
 - Business category (dropdown, 15+ options)
-- **Business website URL** (text input, URL format) - *Required for TrueBiz business verification*
+- **Business website URL** (text input, URL format) - *Required for TrueBiz business data enhancement*
+- **Business phone number** (text input, US format) - *Required for payment processing*
+- **Business structure** (dropdown) - *Required to determine individual vs company account type*
+  - Sole Proprietorship
+  - LLC
+  - Corporation (C-Corp or S-Corp)
+  - Partnership
+  - Non-profit
 - Business address:
   - Street address
   - City
@@ -120,65 +112,67 @@ The signup flow uses a 2-page wizard pattern with client-side state management. 
 **Validation Rules**:
 - All fields required
 - Business website: Must be valid URL format (supports http/https, with or without www)
+- Business phone: Must be valid US phone format (10 digits)
+- Business structure: Must select one option
 - ZIP code: Must match format `^\d{5}(-\d{4})?$`
 - Number of locations: Must be ≥ 1
 
 **User Experience**:
 - Sectioned form with clear groupings:
   - Business Category
-  - Business Website (with helper text: "We'll use this to verify your business information")
+  - Business Website (with helper text: "We'll use this to enrich your business profile")
+  - Business Phone
+  - Business Structure (with helper text: "This determines your account type for payment processing")
   - Business Address (4 fields)
   - Business Size (revenue + locations)
 - Real-time validation on blur
 - Inline error messages
 - "Back" button to return to Page 1 (preserves data)
 - "Continue to Setup" button with loading state
+- On submission → TrueBiz data enhancement runs → Cohort assigned → User redirected to dashboard
 
-**Flow (Current Prototype)**:
-1. User fills out business category
-2. User completes business address fields
-3. User selects annual revenue range
-4. User enters number of locations
-5. User clicks "Continue to Setup"
-6. 800ms loading animation (shows spinner)
-7. Cohort determination logic runs
-8. Data saved to localStorage as `prequalificationData`
-9. User redirected to `/dashboard`
+**Note**: No Stripe account is created during signup. TrueBiz enriches business data for pre-population. Official KYC/KYB verification happens later via Trulioo during dashboard tasks.
 
 ---
 
-## TrueBiz Business Verification
+## TrueBiz Business Data Enhancement
 
 **When**: After user clicks "Continue to Setup" on Page 2
 
-**Purpose**: Validate business legitimacy and prevent fraud BEFORE account creation
+**Purpose**: Enrich business profile data and validate business legitimacy to prevent fraud BEFORE account creation
+
+**Note**: TrueBiz is NOT the official KYC/KYB verification provider. It's a data enrichment tool that validates and enhances business information. Official identity and business verification is handled by Trulioo during dashboard tasks.
 
 ### Future Implementation Flow
 
 After user clicks "Continue to Setup", the following verification flow runs BEFORE account creation:
 
-#### 1. TrueBiz Business Verification API Call (5-10 seconds)
+#### 1. TrueBiz Business Data Enhancement API Call (5-10 seconds)
 
-**Verification Checks**:
+**Enhancement Checks**:
 - Validates business website domain exists and is active
 - Checks business legitimacy and registration status
 - Performs fraud detection and risk assessment
 - Cross-references address with business records
-- Returns verification result: `APPROVE` / `REVIEW` / `REJECT`
+- Enriches business profile with additional data
+- Returns result: `APPROVE` / `REVIEW` / `REJECT`
 
-**Provider**: TrueBiz (business verification service via domain/URL lookup)
+**Provider**: TrueBiz (business data enrichment service via domain/URL lookup)
 
-**Cost**: ~$0.50-$2.00 per verification (estimated, custom pricing)
+**Cost**: ~$0.50-$2.00 per lookup (estimated, custom pricing)
+
+**What It's NOT**: This is not the official KYC/KYB compliance verification. That is handled by Trulioo during dashboard tasks.
 
 ---
 
-#### 2. Verification Outcome Handling
+#### 2. Enhancement Outcome Handling
 
 **✅ APPROVED (Pass)**:
-- Verification score meets threshold (e.g., ≥80/100)
+- Enhancement score meets threshold (e.g., ≥80/100)
+- Business data enriched and pre-populated
 - Cohort determination logic runs
 - Lightspeed X-Series account provisioned
-- Data saved with verification metadata
+- Data saved with enhancement metadata
 - User redirected to `/dashboard`
 - Estimated time: ~10 seconds total
 
@@ -220,12 +214,14 @@ After user clicks "Continue to Setup", the following verification flow runs BEFO
 
 ---
 
-### Why Verify at Signup
+### Why Use TrueBiz at Signup
 
 - **Fraud Prevention**: Block high-risk merchants before account creation
 - **Cost Optimization**: Avoid provisioning X-Series accounts for ineligible merchants
-- **Compliance**: Meet "Know Your Business" (KYB) requirements early
-- **User Experience**: Fast approval for legitimate businesses (~10 seconds)
+- **Data Enrichment**: Pre-populate business data to reduce merchant data entry downstream
+- **User Experience**: Fast validation for legitimate businesses (~10 seconds)
+
+**Note**: This is NOT the official KYB/KYC compliance verification. Official verification is handled by Trulioo during dashboard tasks before purchase.
 
 ### Integration Details
 
@@ -293,24 +289,26 @@ Automatic cohort assignment based on business size:
 
 **Note**: Location count can override revenue-based cohort assignment
 
-### Current Implementation
+### Cohort Experience Differences
 
-- All cohorts see the same merchant-facing UI
-- Cohort stored for future specialist assignment
-- Future: Will affect specialist assignment and pricing
+**Self-Serve**:
+- Fully automated dashboard experience
+- Standard support (chat, email)
+- No specialist assignment
+- Self-guided setup tasks
 
-### Future Differentiation
+**Assisted**:
+- Sales-guided with self-checkout option
+- Specialist banner on dashboard with "Schedule a call" option
+- Free IC support available
+- Can still complete setup independently
 
-- **Self-Serve**: No changes to current flow
-- **Assisted**:
-  - Specialist banner on dashboard
-  - "Schedule a call" option
-  - Can still self-serve
-- **Managed**:
-  - Required specialist introduction
-  - Custom pricing negotiations
-  - Scheduled onboarding sessions
-  - Implementation package included
+**Managed**:
+- White-glove implementation with specialist introduction
+- Dedicated account manager assigned
+- Custom pricing negotiations
+- Scheduled onboarding sessions
+- Implementation package included
 
 ---
 
@@ -342,29 +340,24 @@ Automatic cohort assignment based on business size:
 
 ---
 
-## Technical Implementation
+## Data Captured During Signup
 
-### Key Technologies
-
-- **Framework**: Next.js 15.5.4 (App Router)
-- **Language**: TypeScript 5+
-- **Styling**: Tailwind CSS 4
-- **Components**: shadcn/ui (Radix UI primitives)
-- **Animations**: Framer Motion 12
-- **Icons**: Lucide React
-
-### Data Storage
-
-**localStorage Keys**:
-- `prequalificationData`: Account + business info from signup
-
+**Account Information (Page 1)**:
 ```typescript
 {
   businessName: string;
   email: string;
   password: string;
+}
+```
+
+**Business Information (Page 2)**:
+```typescript
+{
   businessCategory: string;
   businessWebsite: string;  // Used for TrueBiz business verification
+  businessPhone: string;  // Required for payment processing
+  businessStructure: 'sole_proprietorship' | 'llc' | 'corporation' | 'partnership' | 'non_profit';
   businessAddress: {
     street: string;
     city: string;
@@ -373,8 +366,14 @@ Automatic cohort assignment based on business size:
   };
   annualRevenue: string;
   numberOfLocations: number;
-  cohort: 'self-serve' | 'assisted' | 'managed';
-  truebizVerification?: {
+}
+```
+
+**Generated Data**:
+```typescript
+{
+  cohort: 'self-serve' | 'assisted' | 'managed';  // Auto-assigned based on revenue/locations
+  truebizVerification: {
     status: 'APPROVED' | 'REVIEW' | 'REJECTED';
     verificationId: string;
     score: number;
@@ -384,36 +383,6 @@ Automatic cohort assignment based on business size:
   createdAt: string;
 }
 ```
-
-### Component Architecture
-
-**Page Components** (`app/**/*.tsx`):
-- Use `'use client'` directive
-- Manage route-level state
-- Handle data loading and persistence
-- Coordinate child components
-
-**Form Components** (`components/get-started/*.tsx`):
-- `AccountForm`: Page 1 account creation
-- `BusinessForm`: Page 2 business information
-
-**UI Primitives** (`components/ui/*.tsx`):
-- shadcn/ui base components
-- Button, Input, Card, Label, etc.
-- Accessible by default (WCAG AA)
-
-### Form Handling
-
-**Current Pattern**:
-- Controlled inputs with useState
-- Manual validation functions
-- Error state management
-- Submit handlers
-
-**Future Enhancement**:
-- React Hook Form for form state
-- Zod schemas for validation
-- Automatic error handling
 
 ---
 
@@ -494,8 +463,3 @@ If APPROVED:
 - [Design Specifications](./DESIGN_SPECIFICATIONS.md)
 - [UI Copy Reference](./UI_COPY.md)
 
----
-
-**Last Updated**: January 2025
-**Version**: Current State (Prototype + TrueBiz Verification Planning)
-**Maintainer**: Product & Engineering Teams
