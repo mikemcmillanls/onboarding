@@ -281,6 +281,7 @@ export function SidebarFooter() {
 
 **File:** `/components/dashboard/sidebar-mobile.tsx`
 
+{% raw %}
 ```typescript
 'use client';
 
@@ -360,6 +361,7 @@ export function SidebarMobile({ businessName }: SidebarMobileProps) {
   );
 }
 ```
+{% endraw %}
 
 ### 6. Checklist Card Component
 
@@ -561,6 +563,7 @@ export function StatusBadge({ required, completed, className }: StatusBadgeProps
 
 **File:** `/components/dashboard/progress-indicator.tsx`
 
+{% raw %}
 ```typescript
 'use client';
 
@@ -613,6 +616,7 @@ export function ProgressIndicator({
   );
 }
 ```
+{% endraw %}
 
 ### 9. Hero Section Component
 
@@ -963,6 +967,7 @@ export function canStartTask(task: ChecklistTask, tasks: ChecklistTask[]): boole
 
 **File:** `/app/dashboard/page.tsx`
 
+{% raw %}
 ```typescript
 'use client';
 
@@ -1064,6 +1069,7 @@ function DashboardSkeleton() {
   );
 }
 ```
+{% endraw %}
 
 ### Dashboard Layout Wrapper
 
