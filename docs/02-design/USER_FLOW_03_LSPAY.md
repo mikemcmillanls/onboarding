@@ -44,12 +44,11 @@ This flow uses multiple verification providers at different stages:
 1. [Verification Providers](#verification-providers)
 2. [Key Architecture Principles](#key-architecture-principles)
 3. [User Journey Overview](#user-journey-overview)
-4. [Phase 1: Signup](#phase-1-signup-no-stripe-account-created)
-5. [Phase 2: Data Collection](#phase-2-data-collection-dashboard-tasks)
-6. [Phase 3: Purchase & Verification](#phase-3-purchase-and-verification)
-7. [Phase 4: Bank Account Setup](#phase-4-bank-account-setup-optional)
-8. [Timeline Expectations](#timeline-expectations)
-9. [Related Documentation](#related-documentation)
+4. [Data Collection (Dashboard Tasks)](#data-collection-dashboard-tasks)
+5. [Verification Processing (After Purchase)](#verification-processing-after-purchase)
+6. [Verification Error Handling](#verification-error-handling-what-merchants-see)
+7. [Timeline Expectations](#timeline-expectations)
+8. [Related Documentation](#related-documentation)
 
 ---
 
@@ -72,147 +71,80 @@ This flow uses multiple verification providers at different stages:
 
 ## User Journey Overview
 
+This document focuses on the **identity verification** portion of the merchant onboarding journey. For complete end-to-end flow, see:
+- [User Flow 1: Signup](./USER_FLOW_01_SIGNUP_AND_PROVISIONING.md) - Before this flow
+- [User Flow 2: Dashboard](./USER_FLOW_02_DASHBOARD.md) - Parallel to this flow (all 6 tasks)
+- [User Flow 4: Purchase](./USER_FLOW_04_PURCHASE.md) - After this flow
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│ PHASE 1: SIGNUP (Immediate - NO Stripe account yet)        │
+│ PREREQUISITE: Signup Complete (see USER_FLOW_01)           │
 ├─────────────────────────────────────────────────────────────┤
-│ • Merchant completes signup form                            │
-│ • TrueBiz business verification (KYB)                       │
-│ • Create Lightspeed user account                            │
-│ • Assign cohort (self-serve/assisted/managed)               │
-│ • Redirect to dashboard with verification task              │
+│ • Merchant lands on dashboard                               │
+│ • Sees 6 tasks (verification is Tasks 1-2)                  │
 │ • NO STRIPE ACCOUNT CREATED YET                             │
 └─────────────────────────────────────────────────────────────┘
                            ↓
 ┌─────────────────────────────────────────────────────────────┐
-│ PHASE 2: DATA COLLECTION (Dashboard Tasks - Before Purchase)│
+│ STEP 1: Business Representative (KYC Data Collection)      │
 ├─────────────────────────────────────────────────────────────┤
-│ Step 1: Business Representative Collection (KYC)           │
-│         → Data SAVED to YOUR database (encrypted)           │
-│         → ToS acceptance captured (date, IP, user agent)    │
-│ Step 2: Business Entity Information (KYB)                  │
-│         → Data SAVED to YOUR database                       │
-│ Step 3: Beneficial Owners (if 25%+ ownership exists)       │
-│         → Data SAVED to YOUR database                       │
-│ Step 4: Location Confirmation                              │
-│         → Data SAVED to YOUR database                       │
+│ • Merchant completes identity verification form             │
+│ • Personal information (name, DOB, SSN last 4)              │
+│ • Home address                                              │
+│ • Role in business (owner/executive)                        │
+│ • ToS acceptance                                            │
 │                                                             │
-│ ALL DATA STORED IN YOUR DATABASE - No Stripe API calls yet │
+│ → Data SAVED to YOUR database (encrypted)                   │
+│ → ToS acceptance captured (date, IP, user agent)            │
+│ → NO verification happens yet                               │
 └─────────────────────────────────────────────────────────────┘
                            ↓
 ┌─────────────────────────────────────────────────────────────┐
-│ PHASE 3: PURCHASE FLOW (Stripe account created HERE)       │
+│ STEP 2: Business Entity (KYB Data Collection)             │
 ├─────────────────────────────────────────────────────────────┤
-│ • Merchant completes Tasks 1-2 (data collection)            │
-│ • Merchant configures POS (locations, registers)            │
-│ • Merchant selects hardware bundles                         │
-│ • Merchant clicks "Complete Purchase"                       │
-│ • Process payment for hardware/software                     │
+│ • Merchant confirms/edits business details                  │
+│ • Legal name, structure, EIN                                │
+│ • Business address and contact info                         │
+│ • Product description                                       │
 │                                                             │
-│ 🔑 CREATE STRIPE ACCOUNT WITH ALL PRE-COLLECTED DATA        │
-│   → stripe.accounts.create() with complete profile          │
-│   → stripe.accounts.createPerson() for rep + owners         │
-│   → All in one transaction (< 1 second)                     │
-│   → Store Stripe account ID in database                     │
-│                                                             │
-│ • Order confirmed → Hardware ships                          │
-│ • Verification processes in background (1-2 days)           │
+│ → Data SAVED to YOUR database                               │
+│ → NO verification happens yet                               │
 └─────────────────────────────────────────────────────────────┘
                            ↓
 ┌─────────────────────────────────────────────────────────────┐
-│ PHASE 4: VERIFICATION (Background - After Purchase)        │
+│ STEP 3: Beneficial Owners (Conditional - If Applicable)    │
 ├─────────────────────────────────────────────────────────────┤
-│ • Stripe processes verification (1-2 business days)          │
-│ • Checks SSN against government records                      │
-│ • Verifies addresses and business entity                     │
-│ • Webhook: account.updated → charges_enabled = true         │
-│ • Payment processing activates                               │
-│ • Merchant can accept payments                               │
+│ • Only if multi-member LLC, partnership, or corporation     │
+│ • Add all co-owners with 25%+ ownership                     │
+│ • Name, DOB, address, SSN last 4, ownership %               │
+│                                                             │
+│ → Data SAVED to YOUR database                               │
+│ → Tasks 1-2 now complete, ready to purchase                 │
 └─────────────────────────────────────────────────────────────┘
                            ↓
 ┌─────────────────────────────────────────────────────────────┐
-│ PHASE 5: BANK ACCOUNT (Optional - Anytime)                 │
+│ NEXT: Purchase Flow (see USER_FLOW_04)                     │
 ├─────────────────────────────────────────────────────────────┤
-│ • Merchant adds bank account for payouts                    │
-│ • Micro-deposit verification (1-2 days) or instant (Plaid)  │
-│ • payouts_enabled becomes true                              │
-│ • Funds flow to bank account                                │
+│ • Merchant selects subscription and hardware                │
+│ • Completes checkout                                        │
+│ • 🔑 Stripe account created WITH all pre-collected data      │
+│ • Order confirmed                                           │
+└─────────────────────────────────────────────────────────────┘
+                           ↓
+┌─────────────────────────────────────────────────────────────┐
+│ VERIFICATION PROCESSING (Background - This Document)       │
+├─────────────────────────────────────────────────────────────┤
+│ • Trulioo KYC: Verifies individuals (1-2 business days)     │
+│ • Trulioo KYB: Verifies business entity                     │
+│ • Stripe processes results                                  │
+│ • Webhook: charges_enabled = true                           │
+│ • Payment processing activates                              │
 └─────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Phase 1: Signup (NO Stripe Account Created)
-
-**Route**: `/get-started` → `/dashboard`
-
-**Purpose**: Capture basic business information and route merchant to dashboard
-
-**Duration**: 5-10 minutes
-
----
-
-### What Happens
-
-1. **Merchant Completes Signup Form**
-   - See [User Flow 1: Signup](./USER_FLOW_01_SIGNUP_AND_PROVISIONING.md) for complete signup flow
-
-2. **TrueBiz Business Verification (Automatic)**
-   - Validates business legitimacy via website domain
-   - Fraud detection and risk assessment
-   - Returns: APPROVED / REVIEW / REJECTED
-
-3. **Lightspeed Account Created** (If TrueBiz approves)
-   - User account created in Lightspeed database
-   - Cohort assigned (Self-Serve / Assisted / Managed)
-   - **Important**: NO Stripe account created yet
-
-4. **Merchant Redirected to Dashboard**
-   - Sees Task #1: "Verify Your Identity" (not started)
-   - Sees Task #2: "Configure Your POS" (not started)
-   - Cannot purchase until these tasks complete
-
----
-
-### Data Captured During Signup
-
-| Field | Source | Pre-filled Later? | Why Required |
-|-------|--------|-------------------|--------------|
-| Business Name | Signup form | Yes → Step 2 (Legal Business Name) | Required for Stripe company account |
-| Email | Signup form | Yes → Step 1 (Email) | Primary contact and account identifier |
-| Business Phone | Signup form | Yes → Step 1 (Personal Phone default), Step 2 (Business Phone + Support Phone) | Required for payment processing and customer support |
-| Business Website | Signup form | Yes → Step 2 (Business Website) | Required for card-not-present transactions |
-| Business Structure | Signup form | Yes → Step 2 (Business Structure) | Determines verification requirements (must be confirmed) |
-| Business Address | Signup form | Yes → Step 2 (Street, City, State, ZIP) | Required for legal entity verification |
-| Business Category | Signup form | Yes → Step 2 (Business Category) | Determines MCC code (processing rates) |
-| Annual Revenue | Signup form | No (cohort assignment only) | Cohort assignment |
-| Number of Locations | Signup form | No (configuration only) | Configuration planning |
-
----
-
-### What Merchant Sees
-
-**Dashboard After Signup**:
-```
-Welcome, [Business Name]!
-
-Complete these tasks to activate payments:
-
-Task 1: Verify Your Identity              ⭕ Not Started
-        Provide representative information
-        Estimated time: 10-15 minutes
-
-Task 2: Configure Your POS                ⭕ Not Started
-        Set up locations and hardware
-        Estimated time: 5-10 minutes
-
-[Button: Complete Purchase] 🔒 Locked
-Complete Tasks 1-2 to unlock purchase
-```
-
----
-
-## Phase 2: Data Collection (Dashboard Tasks)
+## Data Collection (Dashboard Tasks)
 
 **Route**: `/dashboard` → Task #1 and Task #2
 
@@ -474,262 +406,71 @@ Does anyone else own 25% or more of this business?
 
 ---
 
-### Step 4: Location Configuration (Optional for Phase 2)
+## What Happens After Data Collection Complete
 
-**Dashboard Task**: "Configure Your Locations" (Separate from payment verification)
+**Ready to Purchase**: When merchants complete Tasks 1-2 (and Task 3 if multi-member business), they can proceed to purchase. See [User Flow 4: Purchase](./USER_FLOW_04_PURCHASE.md) for the complete checkout and order fulfillment experience.
 
-**Estimated Time**: 2-5 minutes
+**Stripe Account Creation**: The Stripe Custom account is created DURING the purchase checkout flow (not during these verification tasks). All data collected here is stored securely in your database and submitted to Stripe when the merchant completes their purchase.
 
-**Purpose**: Configure POS locations and hardware needs (not required for payment verification)
-
-**Note**: This step is for Lightspeed X-Series configuration, NOT for Stripe verification. Stripe verification is at the account level - all locations use the same Stripe account.
+**Verification Processing**: After purchase completes and the Stripe account is created, Trulioo processes KYC/KYB verification in the background (1-2 business days). Merchants receive email updates on verification status.
 
 ---
 
-#### What Merchant Sees
+## Verification Processing (After Purchase)
 
-**Form Title**: "Configure Your Locations"
+**When Verification Begins**: Immediately after merchant completes purchase and Stripe account is created with pre-collected data
 
-**Instructions**: "Tell us about your store locations so we can configure your POS system."
+**Duration**: 1-2 business days (background processing)
 
----
+**What's Being Verified**:
 
-#### Data Collected
+### Trulioo KYC (Individual Identity Verification)
+- Checks SSN against government records
+- Validates addresses via credit bureaus
+- Confirms age (18+ requirement)
+- Verifies identity matches provided information
 
-| Field | Pre-filled? | User Action | Purpose |
-|-------|-------------|-------------|---------|
-| Number of Locations | Yes (from signup) | Confirm/Edit | Software licensing |
-| **For Each Location** | | | |
-| Location Name | No | Enter (e.g., "Main Street Store") | Internal reference |
-| Street Address | No | Enter | Hardware shipping address |
-| City | No | Enter | Hardware shipping |
-| State | No | Select | Hardware shipping |
-| ZIP Code | No | Enter | Hardware shipping |
-| Registers per Location | No | Enter (number) | Hardware and license planning |
+**Who Gets Verified**:
+- Business representative (always)
+- All beneficial owners with 25%+ ownership (if applicable)
 
----
+### Trulioo KYB (Business Entity Verification)
+- Checks EIN against IRS records
+- Validates business registration with state
+- Confirms legal structure (LLC, Corp, etc.)
+- Verifies business address
 
-#### Why This Data?
-
-- **Not for Stripe**: Stripe doesn't need location-specific data (verification is account-level)
-- **Software Licensing**: Determines number of POS licenses needed
-- **Hardware Shipping**: Where to send POS terminals and equipment
-- **System Configuration**: Pre-configure X-Series with location structure
-
----
-
-#### What Happens After Submission
-
-1. **Data Saved**: Location information stored in Lightspeed database
-2. **Quote Generated**: System calculates software + hardware costs based on locations
-3. **Ready to Purchase**: Purchase button unlocks (if Tasks 1-2 also complete)
-4. **Future Use**: Shipping addresses used when hardware is ready to ship
+### Stripe Processing
+- Reviews verification results for compliance
+- Assesses risk profile
+- Enables payment capabilities when approved
 
 ---
 
-## Phase 3: Purchase and Verification
+## Verification Status Updates
 
-**Route**: `/dashboard` → `/checkout` → Background verification
+**What Merchants See During Verification**:
 
-**Purpose**: Merchant completes purchase, Stripe account created, verification processes automatically
-
-**Duration**: 5 minutes (purchase) + 1-2 business days (verification)
-
----
-
-### Purchase Gate Requirements
-
-Before merchant can click "Complete Purchase", these must be true:
-
-| Requirement | Status Needed | User Message if Blocked |
-|-------------|---------------|-------------------------|
-| Task #1: Representative Data | Complete | "Please complete Task 1: Verify Your Identity" |
-| Task #2: Business Entity Data | Complete | "Please complete Task 2: Configure Your Business" |
-| ToS Acceptance | Checked | "Please accept Stripe's Connected Account Agreement" |
-| Beneficial Owners (if required) | Complete | "Please add all co-owners with 25%+ ownership" |
-| Location Configuration | Complete | "Please configure at least one location" |
+Merchants can track verification status in their dashboard. See [User Flow 4: Post-Purchase Experience](./USER_FLOW_04_PURCHASE.md#post-purchase-experience) for complete details on:
+- Order tracking
+- Verification status updates
+- Hardware shipping notifications
+- Email alerts
 
 ---
 
-### Dashboard States
+## Payment Activation
 
-**Before Tasks Complete**:
-```
-Task 1: Verify Your Identity        ⭕ Not Started
-Task 2: Configure Your Business     ⭕ Not Started
+**When Payments Activate**: After Stripe processes successful verification (typically 1-2 business days)
 
-[Button: Complete Purchase] 🔒 Locked
-Complete Tasks 1-2 to unlock
-```
+**What Happens**:
+1. System receives Stripe webhook: `account.updated`
+2. Status changes: `charges_enabled = true`
+3. Email sent to merchant: "You're approved to accept payments!"
+4. Hardware ships to configured locations
+5. Merchant can immediately accept payments when hardware arrives
 
-**After Tasks Complete**:
-```
-Task 1: Verify Your Identity        ✓ Complete
-Task 2: Configure Your Business     ✓ Complete
-
-[Button: Complete Purchase] ✓ Ready
-Review and complete your order
-```
-
-**After Purchase (Verification in Progress)**:
-```
-Task 1: Verify Your Identity        ✓ Complete
-Task 2: Configure Your Business     ✓ Complete
-
-Order Status: ✓ Purchase Complete
-Verification Status: ⏳ In Progress (1-2 business days)
-
-What's happening:
-• Your identity and business are being verified
-• Hardware will ship once verification completes
-• You'll receive email updates on progress
-```
-
-**After Verification Completes**:
-```
-Order Status: ✓ Purchase Complete
-Verification Status: ✓ Approved
-Hardware Status: 📦 Shipped
-
-✓ You're approved to accept payments!
-Next: Set up your POS hardware when it arrives
-```
-
----
-
-### What Happens Behind the Scenes (After Purchase)
-
-**Step 1: Purchase Complete** (Immediate)
-- Merchant pays for software + hardware via standard payment processing
-- Order confirmation displayed
-- Confirmation email sent
-
-**Step 2: Stripe Account Creation** (< 1 second, automatic)
-- System retrieves all pre-collected data from database
-- Stripe Custom account created with complete profile
-- Representative and beneficial owners added
-- ToS acceptance submitted
-- Stripe account ID stored in database
-
-**Step 3: Identity Verification Begins** (Background, 1-2 business days)
-- **Trulioo KYC**: Verifies individual identities (representative + owners)
-  - Checks SSN against government records
-  - Validates addresses via credit bureaus
-  - Confirms age and identity
-- **Trulioo KYB**: Verifies business entity
-  - Checks EIN against IRS records
-  - Validates business registration
-  - Confirms legal structure
-- **Stripe Processing**: Processes verification results
-  - Reviews for compliance
-  - Assesses risk profile
-  - Enables payment capabilities
-
-**Step 4: Verification Complete** (Webhook notification)
-- System receives Stripe webhook: `account.updated`
-- Status changes: `charges_enabled = true`
-- Email sent to merchant: "You're approved to accept payments!"
-- Hardware shipping triggered
-
-**Step 5: Hardware Ships** (After verification)
-- Ships to location addresses
-- Tracking number sent via email
-- Estimated delivery: 3-5 business days
-
-**Step 6: Payments Ready** (When hardware arrives)
-- Merchant sets up POS terminals
-- Can immediately accept payments
-- Funds accumulate in Stripe balance
-- Payouts held until bank account added (optional)
-
----
-
-## Phase 4: Bank Account Setup (Optional)
-
-**Route**: `/dashboard` → "Add Bank Account" task
-
-**Purpose**: Enable payouts so merchant can receive funds from transactions
-
-**When**: Anytime - before purchase, after purchase, or after first sale
-
-**Duration**: 2-3 minutes + 1-2 days verification (or instant with Plaid)
-
-**Important**: Merchants can accept payments WITHOUT a bank account. Funds accumulate in Stripe balance until bank account is verified.
-
----
-
-### What Merchant Sees
-
-**Dashboard Task** (Optional, appears after payment approval):
-```
-Task: Add Bank Account for Payouts    ⭕ Not Started (Optional)
-      Connect your bank to receive funds
-      Estimated time: 2 minutes
-```
-
-**Form Title**: "Add Bank Account"
-
-**Instructions**: "Connect your bank account to receive payouts from sales. You can accept payments without this, but funds will be held until you add a bank account."
-
----
-
-### Data Collected
-
-| Field | Pre-filled? | User Action | Why Required |
-|-------|-------------|-------------|--------------|
-| Account Holder Name | No | Enter (person or business name) | Must match bank records |
-| Account Holder Type | No | Select: Individual or Company | Determines verification requirements |
-| Bank Name | No | Enter (e.g., "Chase", "Wells Fargo") | For display purposes only |
-| Routing Number | No | Enter (9 digits) | Identifies bank |
-| Account Number | No | Enter (4-17 digits) | Identifies account |
-| Confirm Account Number | No | Re-enter for validation | Prevents typos |
-
----
-
-### Validation Rules
-
-- **Routing Number**: Exactly 9 digits, numbers only
-- **Account Number**: 4-17 digits (varies by bank), numbers only
-- **Account Numbers**: Must match exactly
-- **Account Holder Name**: Must match business name or individual name on account
-
----
-
-### Verification Methods
-
-**Option 1: Micro-Deposit Verification** (Standard, 1-2 business days)
-
-1. **Submit Bank Info**: Merchant enters routing and account numbers
-2. **Stripe Sends Deposits**: Stripe sends 2 small deposits (e.g., $0.32, $0.45) to the account
-3. **Wait 1-2 Days**: Deposits appear in merchant's bank account
-4. **Confirm Amounts**: Merchant returns to dashboard and enters the two deposit amounts
-5. **Verification Complete**: Stripe verifies → payouts enabled automatically
-
-**Option 2: Instant Verification via Plaid** (Immediate, if available)
-
-1. **Click "Verify Instantly"**: Merchant chooses instant verification option
-2. **Redirect to Plaid**: Merchant redirected to Plaid authentication
-3. **Log into Bank**: Merchant logs into their bank via Plaid
-4. **Confirm Ownership**: Plaid confirms account ownership
-5. **Verification Complete**: Immediately verified → payouts enabled right away
-
----
-
-### What Happens After Verification
-
-- **Payouts Enabled**: `payouts_enabled = true` in Stripe
-- **Automatic Payouts**: Funds transfer automatically (default: daily, 2-day delay)
-- **Email Notification**: "Bank account verified - payouts enabled!"
-- **Dashboard Update**: Task status changes to "Complete"
-
----
-
-### Why This Is Optional
-
-- **Can Accept Payments Without Bank**: Merchant can process transactions immediately
-- **Funds Held Safely**: Funds accumulate in Stripe balance until bank account verified
-- **Flexible Timing**: Merchant can add bank account whenever convenient
-- **No Pressure**: Can start selling before setting up payouts
+**Note**: Merchants can accept payments WITHOUT a bank account. Funds accumulate safely in Stripe balance until they add bank account details. See [User Flow 2: Task 3 - Bank Account](./USER_FLOW_02_DASHBOARD.md#task-3-connect-bank-for-payouts) for details.
 
 ---
 
