@@ -1300,12 +1300,12 @@ export default function DashboardPage() {
 
       <ChecklistGrid>
         {tasks.map((task, index) => (
-          <motion.div
+          {% raw %}<motion.div
             key={task.id}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
-          >
+          >{% endraw %}
             <ChecklistCard
               title={task.title}
               description={task.description}

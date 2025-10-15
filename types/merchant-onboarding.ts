@@ -217,6 +217,8 @@ export interface ChecklistTask {
   required: boolean;
   route: string;
   icon?: string;
+  timeEstimate?: string;
+  badgeText?: string;
 }
 
 export interface DashboardState {

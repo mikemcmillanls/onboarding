@@ -14,36 +14,44 @@ import { Loader2 } from 'lucide-react';
 // Default checklist tasks
 const getDefaultChecklistTasks = (): ChecklistTask[] => [
   {
-    id: 'payment-setup',
-    title: 'Payment Setup',
-    description: 'Set up payment processing and connect your bank account',
-    status: 'not-started',
-    required: true,
-    route: '/dashboard/payments',
-  },
-  {
-    id: 'business-verification',
-    title: 'Business Verification',
-    description: 'Verify your identity to start taking payments with Lightspeed',
+    id: 'individual-verification',
+    title: 'Verify Your Identity',
+    description: 'Complete identity verification for you and any business owners. Required to activate payment processing after purchase.',
     status: 'not-started',
     required: true,
     route: '/dashboard/verify',
+    timeEstimate: '10-15 min',
+    badgeText: 'Required to accept payments',
   },
   {
     id: 'pos-configuration',
-    title: 'POS Configuration',
-    description: 'Configure your point of sale system and locations',
+    title: 'Configure Your POS',
+    description: 'Tell us about your business setup. Required to configure payment processing and determine hardware needs.',
     status: 'not-started',
     required: true,
     route: '/dashboard/pos-setup',
+    timeEstimate: '2-3 min',
+    badgeText: 'Required to accept payments',
+  },
+  {
+    id: 'bank-account-payouts',
+    title: 'Connect Bank for Payouts',
+    description: 'You can accept payments without this. Add your bank account to receive payouts from transactions.',
+    status: 'not-started',
+    required: false,
+    route: '/dashboard/payments',
+    timeEstimate: '1-3 min',
+    badgeText: 'Optional - add anytime',
   },
   {
     id: 'hardware-selection',
     title: 'Hardware Selection',
-    description: 'Get the hardware you need to run your business',
+    description: 'Select and order POS hardware bundles. Optional - you can use existing hardware.',
     status: 'not-started',
-    required: true,
+    required: false,
     route: '/dashboard/hardware',
+    timeEstimate: '5-10 min',
+    badgeText: 'Optional - can use existing',
   },
   {
     id: 'team-setup',
@@ -52,6 +60,8 @@ const getDefaultChecklistTasks = (): ChecklistTask[] => [
     status: 'not-started',
     required: false,
     route: '/dashboard/team',
+    timeEstimate: '3-5 min',
+    badgeText: 'Optional - add anytime',
   },
   {
     id: 'import-data',
@@ -60,6 +70,8 @@ const getDefaultChecklistTasks = (): ChecklistTask[] => [
     status: 'not-started',
     required: false,
     route: '/dashboard/import',
+    timeEstimate: '10-30 min',
+    badgeText: 'Optional - add anytime',
   },
 ];
 
@@ -67,35 +79,35 @@ const getDefaultChecklistTasks = (): ChecklistTask[] => [
 function calculateTaskStatus(merchant: StoredMerchant): ChecklistTask[] {
   const tasks = getDefaultChecklistTasks();
 
-  // Payment Setup - based on bankAccountData and KYC status (now index 0)
-  if (merchant.bankAccountData?.accountNumber && merchant.kycStatus === 'approved') {
+  // Individual Verification (KYC) - index 0
+  if (merchant.kycStatus === 'approved') {
     tasks[0].status = 'completed';
-  } else if (merchant.bankAccountData || merchant.kycStatus === 'pending') {
+  } else if (merchant.kycStatus === 'pending' || merchant.kycStatus === 'review') {
     tasks[0].status = 'in-progress';
   }
 
-  // Business Verification - based on KYB status (now index 1)
-  if (merchant.kybStatus === 'approved') {
+  // POS Configuration - index 1
+  if (merchant.posSetupData?.locations && merchant.posSetupData?.registersPerLocation) {
     tasks[1].status = 'completed';
-  } else if (merchant.kybStatus === 'pending' || merchant.kybStatus === 'review') {
+  } else if (merchant.posSetupData) {
     tasks[1].status = 'in-progress';
   }
 
-  // POS Configuration - based on posSetupData (now index 2)
-  if (merchant.posSetupData?.locations && merchant.posSetupData?.registersPerLocation) {
+  // Bank Account (Payouts) - index 2
+  if (merchant.bankAccountData?.accountNumber && merchant.bankAccountData?.routingNumber) {
     tasks[2].status = 'completed';
-  } else if (merchant.posSetupData) {
+  } else if (merchant.bankAccountData) {
     tasks[2].status = 'in-progress';
   }
 
-  // Hardware Selection - based on checkoutData (now index 3)
+  // Hardware Selection - index 3
   if (merchant.checkoutData?.paymentMethod || merchant.posSetupData?.existingHardware?.hasExisting) {
     tasks[3].status = 'completed';
   } else if (merchant.checkoutData) {
     tasks[3].status = 'in-progress';
   }
 
-  // Team Setup - check setupTasks for team-related tasks (now index 4)
+  // Team Setup - index 4
   const teamTask = merchant.setupTasks?.find(t => t.id.includes('team'));
   if (teamTask?.completed) {
     tasks[4].status = 'completed';
@@ -103,7 +115,7 @@ function calculateTaskStatus(merchant: StoredMerchant): ChecklistTask[] {
     tasks[4].status = 'in-progress';
   }
 
-  // Import Data - check setupTasks for import-related tasks (now index 5)
+  // Import Data - index 5
   const importTask = merchant.setupTasks?.find(t => t.id.includes('import') || t.id.includes('data'));
   if (importTask?.completed) {
     tasks[5].status = 'completed';
@@ -238,6 +250,37 @@ export default function DashboardPage() {
           <div className="mb-10">
             <ProgressIndicator completed={completedTasks} total={totalTasks} />
           </div>
+
+          {/* Payment Activation Flow Banner */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="mb-8 p-6 bg-blue-50 border-2 border-blue-200 rounded-lg"
+          >
+            <div className="flex items-start gap-3">
+              <div className="text-2xl">🎯</div>
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-blue-900 mb-2">
+                  Ready to accept payments?
+                </h3>
+                <p className="text-blue-800 mb-3">
+                  Complete these 3 steps to activate payment processing:
+                </p>
+                <ol className="list-decimal list-inside space-y-1 text-blue-800 mb-3">
+                  <li>Verify Your Identity (10-15 minutes)</li>
+                  <li>Configure Your POS (2-3 minutes)</li>
+                  <li>Complete Your Purchase</li>
+                </ol>
+                <p className="text-sm text-blue-700 font-medium">
+                  After purchase, we'll activate payments in 1-2 days.
+                </p>
+                <p className="text-sm text-blue-600 mt-1">
+                  You can add your bank account anytime to receive payouts.
+                </p>
+              </div>
+            </div>
+          </motion.div>
 
           {/* Checklist Section */}
           <motion.div

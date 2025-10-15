@@ -308,6 +308,7 @@ className="transition-colors duration-200"
 
 ### Framer Motion Patterns
 
+{% raw %}
 **Fade In**
 ```jsx
 <motion.div
@@ -358,6 +359,7 @@ className="transition-colors duration-200"
   ))}
 </motion.div>
 ```
+{% endraw %}
 
 ---
 

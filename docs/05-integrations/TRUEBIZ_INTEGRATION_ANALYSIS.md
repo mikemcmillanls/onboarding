@@ -584,6 +584,7 @@ function calculateTotalReviewCount(reviews?: any): number {
 ### 4. UI/UX Components
 
 **Loading Modal**:
+{% raw %}
 ```tsx
 // /components/verification/truebiz-loading-modal.tsx
 
@@ -683,6 +684,7 @@ export function TrueBizLoadingModal() {
   );
 }
 ```
+{% endraw %}
 
 **Rejection Screen**:
 ```tsx

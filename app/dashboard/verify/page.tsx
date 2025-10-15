@@ -14,7 +14,7 @@ export default function BusinessVerificationPage() {
 
   const handleStartVerification = () => {
     setLoading(true);
-    // In production, this would navigate to the KYB verification flow
+    // In production, this would navigate to the KYC verification flow
     // For now, simulate and redirect back to dashboard
     setTimeout(() => {
       router.push('/dashboard');
@@ -43,8 +43,8 @@ export default function BusinessVerificationPage() {
               <ShieldCheck className="h-6 w-6 text-red-600" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Business Verification</h1>
-              <p className="text-gray-600">Required to start accepting payments</p>
+              <h1 className="text-3xl font-bold text-gray-900">Verify Your Identity</h1>
+              <p className="text-gray-600">Individual verification required to accept payments</p>
             </div>
           </div>
         </motion.div>
@@ -57,26 +57,46 @@ export default function BusinessVerificationPage() {
         >
           <Card>
             <CardHeader>
-              <CardTitle>Verify Your Identity</CardTitle>
+              <CardTitle>Individual Identity Verification</CardTitle>
               <CardDescription>
-                We need to verify your business information to comply with payment processing regulations.
+                Verify your identity and any business owners (25%+ ownership) to enable payment processing.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
+              {/* Important Notes Section */}
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                <h4 className="font-semibold text-amber-900 mb-2">Important</h4>
+                <ul className="text-sm text-amber-800 space-y-1">
+                  <li>• This collects identity data for use during purchase</li>
+                  <li>• No Stripe Connect account is created at this stage</li>
+                  <li>• Business verification (KYB) was already completed at signup</li>
+                  <li>• Payment processing activates 1-2 days after purchase</li>
+                </ul>
+              </div>
+
               <div>
-                <h3 className="font-semibold mb-2">What you&apos;ll need:</h3>
+                <h3 className="font-semibold mb-2">Required for each person:</h3>
                 <ul className="list-disc list-inside space-y-2 text-gray-600">
-                  <li>Legal business name and structure</li>
-                  <li>Employer Identification Number (EIN) or SSN</li>
-                  <li>Business address</li>
-                  <li>Business owner information</li>
-                  <li>Government-issued ID</li>
+                  <li>Full legal name and date of birth</li>
+                  <li>Social Security Number (SSN)</li>
+                  <li>Home address</li>
+                  <li>Government-issued ID (driver&apos;s license or passport)</li>
+                  <li>Selfie photo for identity verification</li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="font-semibold mb-2">Who needs to be verified:</h3>
+                <ul className="list-disc list-inside space-y-2 text-gray-600">
+                  <li>Business representative (you)</li>
+                  <li>All beneficial owners with 25%+ ownership</li>
                 </ul>
               </div>
 
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <p className="text-sm text-blue-800">
-                  This verification process typically takes 5-10 minutes. Your information is encrypted and secure.
+                  <strong>Estimated time:</strong> 10-15 minutes. Your information is encrypted and secure.
+                  Required by Stripe to process payments and comply with financial regulations.
                 </p>
               </div>
 

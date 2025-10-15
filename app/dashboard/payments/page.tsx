@@ -50,8 +50,8 @@ export default function PaymentSetupPage() {
               <CreditCard className="h-6 w-6 text-green-600" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Payment Setup</h1>
-              <p className="text-gray-600">Connect your bank account for payouts</p>
+              <h1 className="text-3xl font-bold text-gray-900">Connect Bank for Payouts</h1>
+              <p className="text-gray-600">Optional - you can accept payments without this</p>
             </div>
           </div>
         </motion.div>
@@ -63,12 +63,30 @@ export default function PaymentSetupPage() {
         >
           <Card>
             <CardHeader>
-              <CardTitle>Bank Account Information</CardTitle>
+              <CardTitle>Bank Account for Payouts</CardTitle>
               <CardDescription>
-                Your sales revenue will be deposited to this account
+                Connect your bank account to receive payouts. You can accept payments without this step.
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-6">
+              {/* Important Notes Section */}
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                <h4 className="font-semibold text-amber-900 mb-2">Payment Processing vs Payouts</h4>
+                <ul className="text-sm text-amber-800 space-y-1">
+                  <li>• <strong>Payment Processing (money in):</strong> Enabled by Identity Verification + POS Config + Purchase</li>
+                  <li>• <strong>Payouts (money out):</strong> Enabled by this bank account connection</li>
+                  <li>• You can accept payments without connecting a bank account</li>
+                  <li>• Funds will be held securely by Stripe until you add your bank account</li>
+                </ul>
+              </div>
+
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <p className="text-sm text-blue-800">
+                  <strong>Flexible timing:</strong> Complete before purchase, after purchase, or after your first sale.
+                  <strong> Estimated time:</strong> 1-3 minutes (instant with Plaid or 1-2 days with manual verification).
+                </p>
+              </div>
+
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
                   <Label htmlFor="accountHolder">Account Holder Name</Label>
@@ -125,7 +143,8 @@ export default function PaymentSetupPage() {
 
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                   <p className="text-sm text-blue-800">
-                    Your bank information is encrypted and secure. We&apos;ll verify your account with two small deposits.
+                    Your bank information is encrypted and secure. We recommend using Plaid for instant verification,
+                    or we&apos;ll verify your account with two small deposits within 1-2 business days.
                   </p>
                 </div>
 
