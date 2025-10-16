@@ -65,7 +65,7 @@ export function Header({ userName = 'User' }: HeaderProps) {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button className="text-white text-sm hover:text-gray-300 transition-colors">
-                {userName}
+                My Account
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
