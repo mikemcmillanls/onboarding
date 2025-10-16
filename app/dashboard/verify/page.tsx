@@ -83,7 +83,7 @@ interface VerificationFormData {
   confirmAccountNumber: string;
 }
 
-type StepNumber = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+type StepNumber = 1 | 2 | 3 | 4 | 5 | 6 | 7;
 
 const ROLE_OPTIONS = [
   { value: 'owner', label: 'Business Owner' },
@@ -285,21 +285,17 @@ export default function VerifyPage() {
       }
     }
 
-    // Step 3: Role in Business
+    // Step 3: Role in Business + ToS
     if (step === 3) {
       if (!formData.title) newErrors.title = 'Role is required';
       if ((formData.title === 'owner' || formData.title === 'partner') && !formData.ownershipPercentage) {
         newErrors.ownershipPercentage = 'Ownership percentage is required';
       }
-    }
-
-    // Step 4: Individual ToS
-    if (step === 4) {
       if (!formData.tosAccepted) newErrors.tosAccepted = 'You must accept the terms';
     }
 
-    // Step 5: Business Entity Information (KYB)
-    if (step === 5) {
+    // Step 4: Business Entity Information (KYB)
+    if (step === 4) {
       if (!formData.legalBusinessName.trim()) newErrors.legalBusinessName = 'Legal business name is required';
       if (!formData.businessStructure) newErrors.businessStructure = 'Business structure is required';
 
@@ -332,8 +328,8 @@ export default function VerifyPage() {
       if (!formData.businessCategory) newErrors.businessCategory = 'Business category is required';
     }
 
-    // Step 6: Beneficial Owners (conditional)
-    if (step === 6) {
+    // Step 5: Beneficial Owners (conditional)
+    if (step === 5) {
       const needsOwners = ['llc', 'corporation', 'partnership'].includes(formData.businessStructure);
 
       if (needsOwners && formData.hasOtherOwners && formData.beneficialOwners.length === 0) {
@@ -341,10 +337,10 @@ export default function VerifyPage() {
       }
     }
 
-    // Step 7: Final Review (no additional validation needed)
+    // Step 6: Final Review (no additional validation needed)
 
-    // Step 8: Bank Account (optional - validation only if not skipped)
-    if (step === 8 && !formData.skipBankAccount) {
+    // Step 7: Bank Account (optional - validation only if not skipped)
+    if (step === 7 && !formData.skipBankAccount) {
       if (!formData.bankAccountHolderName.trim()) newErrors.bankAccountHolderName = 'Account holder name is required';
       if (!formData.accountType) newErrors.accountType = 'Account type is required';
 
@@ -374,15 +370,15 @@ export default function VerifyPage() {
   const handleNext = () => {
     if (validateStep(currentStep)) {
       // Skip beneficial owners step if not needed
-      if (currentStep === 5) {
+      if (currentStep === 4) {
         const needsOwners = ['llc', 'corporation', 'partnership'].includes(formData.businessStructure);
         if (!needsOwners) {
-          setCurrentStep(7); // Skip directly to final review
+          setCurrentStep(6); // Skip directly to final review
           return;
         }
       }
 
-      if (currentStep < 8) {
+      if (currentStep < 7) {
         setCurrentStep((prev) => (prev + 1) as StepNumber);
       }
     }
@@ -391,10 +387,10 @@ export default function VerifyPage() {
   const handleBack = () => {
     if (currentStep > 1) {
       // Skip beneficial owners step going back if not needed
-      if (currentStep === 7) {
+      if (currentStep === 6) {
         const needsOwners = ['llc', 'corporation', 'partnership'].includes(formData.businessStructure);
         if (!needsOwners) {
-          setCurrentStep(5); // Go back to business entity
+          setCurrentStep(4); // Go back to business entity
           return;
         }
       }
@@ -405,7 +401,7 @@ export default function VerifyPage() {
   };
 
   const handleSubmit = async () => {
-    if (validateStep(8)) {
+    if (validateStep(7)) {
       await new Promise(resolve => setTimeout(resolve, 1000));
       if (typeof window !== 'undefined') {
         localStorage.setItem('verificationData', JSON.stringify(formData));
@@ -422,11 +418,10 @@ export default function VerifyPage() {
     { number: 1, title: 'Personal Info' },
     { number: 2, title: 'Address & SSN' },
     { number: 3, title: 'Your Role' },
-    { number: 4, title: 'Review KYC' },
-    { number: 5, title: 'Business Info' },
-    { number: 6, title: 'Co-Owners' },
-    { number: 7, title: 'Final Review' },
-    { number: 8, title: 'Bank Account (Optional)' },
+    { number: 4, title: 'Business Info' },
+    { number: 5, title: 'Co-Owners' },
+    { number: 6, title: 'Final Review' },
+    { number: 7, title: 'Bank Account (Optional)' },
   ];
 
   if (loading) {
@@ -589,31 +584,6 @@ export default function VerifyPage() {
                     {errors.ownershipPercentage && <p className="text-sm text-red-600">{errors.ownershipPercentage}</p>}
                   </motion.div>
                 )}
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <p className="text-sm text-blue-900"><strong>Why we need this:</strong> Federal regulations require us to verify the identity of business owners and executives who can authorize payments.</p>
-                </div>
-              </div>
-            </motion.div>
-          )}
-
-          {currentStep === 4 && (
-            <motion.div key="step4" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.3 }} className="space-y-6">
-              <div className="text-center mb-8">
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">Review your identity information</h2>
-                <p className="text-gray-600">Verify your personal details and accept our terms</p>
-              </div>
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 space-y-6">
-                <div className="space-y-4">
-                  <div className="flex justify-between py-2 border-b"><span className="text-gray-600">Name:</span><span className="font-medium">{formData.firstName} {formData.lastName}</span></div>
-                  <div className="flex justify-between py-2 border-b"><span className="text-gray-600">Date of Birth:</span><span className="font-medium">{formData.dateOfBirth ? new Date(formData.dateOfBirth).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : ''}</span></div>
-                  <div className="flex justify-between py-2 border-b"><span className="text-gray-600">Email:</span><span className="font-medium">{formData.email}</span></div>
-                  <div className="flex justify-between py-2 border-b"><span className="text-gray-600">Phone:</span><span className="font-medium">{formData.phone}</span></div>
-                  <div className="flex justify-between py-2 border-b"><span className="text-gray-600">Address:</span><span className="font-medium text-right">{formData.homeAddress.street}, {formData.homeAddress.city}, {formData.homeAddress.state} {formData.homeAddress.zipCode}</span></div>
-                  <div className="flex justify-between py-2 border-b"><span className="text-gray-600">Role:</span><span className="font-medium">{ROLE_OPTIONS.find(r => r.value === formData.title)?.label}</span></div>
-                  {isOwnerRole && formData.ownershipPercentage && (
-                    <div className="flex justify-between py-2 border-b"><span className="text-gray-600">Ownership:</span><span className="font-medium">{formData.ownershipPercentage}%</span></div>
-                  )}
-                </div>
                 <div className="pt-6 border-t space-y-4">
                   <div className="flex items-start gap-3">
                     <Checkbox id="tosAccepted" checked={formData.tosAccepted} onCheckedChange={(checked) => updateField('tosAccepted', checked === true)} className="mt-1" />
@@ -624,14 +594,14 @@ export default function VerifyPage() {
                   {errors.tosAccepted && <p className="text-sm text-red-600">{errors.tosAccepted}</p>}
                 </div>
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <p className="text-sm text-blue-900"><strong>Next up:</strong> We&apos;ll need your business entity information to complete verification.</p>
+                  <p className="text-sm text-blue-900"><strong>Why we need this:</strong> Federal regulations require us to verify the identity of business owners and executives who can authorize payments.</p>
                 </div>
               </div>
             </motion.div>
           )}
 
-          {currentStep === 6 && (
-            <motion.div key="step6" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.3 }} className="space-y-6">
+          {currentStep === 5 && (
+            <motion.div key="step5" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.3 }} className="space-y-6">
               <div className="text-center mb-8">
                 <h2 className="text-3xl font-bold text-gray-900 mb-2">Beneficial owners</h2>
                 <p className="text-gray-600">Federal law requires us to verify anyone who owns 25% or more of your business</p>
@@ -827,8 +797,8 @@ export default function VerifyPage() {
             </motion.div>
           )}
 
-          {currentStep === 7 && (
-            <motion.div key="step7" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.3 }} className="space-y-6">
+          {currentStep === 6 && (
+            <motion.div key="step6" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.3 }} className="space-y-6">
               <div className="text-center mb-8">
                 <h2 className="text-3xl font-bold text-gray-900 mb-2">Final review</h2>
                 <p className="text-gray-600">Review all your information before submitting</p>
@@ -894,8 +864,8 @@ export default function VerifyPage() {
             </motion.div>
           )}
 
-          {currentStep === 5 && (
-            <motion.div key="step5" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.3 }} className="space-y-6">
+          {currentStep === 4 && (
+            <motion.div key="step4" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.3 }} className="space-y-6">
               <div className="text-center mb-8">
                 <h2 className="text-3xl font-bold text-gray-900 mb-2">Business entity information</h2>
                 <p className="text-gray-600">Provide your official business details as they appear on tax documents</p>
@@ -1022,8 +992,8 @@ export default function VerifyPage() {
             </motion.div>
           )}
 
-          {currentStep === 8 && (
-            <motion.div key="step8" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.3 }} className="space-y-6">
+          {currentStep === 7 && (
+            <motion.div key="step7" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.3 }} className="space-y-6">
               <div className="text-center mb-8">
                 <h2 className="text-3xl font-bold text-gray-900 mb-2">Connect your bank account (Optional)</h2>
                 <p className="text-gray-600">You&apos;re almost done! Connect your bank account to receive automatic payouts from your sales.</p>
@@ -1133,7 +1103,7 @@ export default function VerifyPage() {
             <ArrowLeft className="w-4 h-4 mr-2" />
             {currentStep === 1 ? 'Back to Dashboard' : 'Previous'}
           </Button>
-          {currentStep < 8 ? (
+          {currentStep < 7 ? (
             <Button onClick={handleNext} className="flex-1 bg-red-600 hover:bg-red-700">
               Continue
               <ArrowRight className="w-4 h-4 ml-2" />
