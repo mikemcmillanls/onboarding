@@ -266,7 +266,7 @@ export default function DashboardPage() {
             </div>
 
             {/* Checklist Cards */}
-            <div className="space-y-2">
+            <div className="space-y-4">
               {checklistTasks.map((task, index) => (
                 <ChecklistCard key={task.id} task={task} index={index} />
               ))}

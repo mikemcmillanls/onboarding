@@ -46,61 +46,72 @@ export function ChecklistCard({ task, index }: ChecklistCardProps) {
     >
       <Card
         className={cn(
-          'group hover:shadow-md transition-all duration-200 bg-white',
-          config.borderColor
+          'group hover:shadow-lg transition-all duration-200 bg-white border border-gray-200 rounded-xl overflow-hidden',
+          task.status === 'completed' && 'bg-gray-50'
         )}
       >
-        <CardContent className="p-3">
-          <div className="flex items-center gap-3">
+        <CardContent className="p-6">
+          <div className="flex items-start gap-4">
             {/* Status Icon */}
-            <div className="flex-shrink-0">
-              <StatusIcon className={cn('h-5 w-5', config.iconColor)} />
+            <div className="flex-shrink-0 pt-1">
+              <div className={cn(
+                'w-6 h-6 rounded-full flex items-center justify-center',
+                task.status === 'not-started' && 'bg-gray-100',
+                task.status === 'in-progress' && 'bg-blue-50',
+                task.status === 'completed' && 'bg-green-50'
+              )}>
+                <StatusIcon className={cn('h-4 w-4', config.iconColor)} />
+              </div>
             </div>
 
             {/* Content */}
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 flex-wrap">
-                <h3 className="text-sm font-semibold text-gray-900">
-                  {task.title}
-                </h3>
-                {task.timeEstimate && (
-                  <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-700">
-                    {task.timeEstimate}
-                  </span>
-                )}
-                {task.badgeText && (
-                  <span
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex-1">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    {task.title}
+                  </h3>
+                  <div className="flex items-center gap-2 mb-2 flex-wrap">
+                    {task.timeEstimate && (
+                      <span className="inline-flex items-center px-2.5 py-1 rounded-md text-sm font-medium bg-gray-100 text-gray-700">
+                        {task.timeEstimate}
+                      </span>
+                    )}
+                    {task.badgeText && (
+                      <span
+                        className={cn(
+                          'inline-flex items-center px-2.5 py-1 rounded-md text-sm font-medium',
+                          task.required
+                            ? 'bg-red-50 text-red-700 border border-red-200'
+                            : 'bg-blue-50 text-blue-700 border border-blue-200'
+                        )}
+                      >
+                        {task.badgeText}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-sm text-gray-600 leading-relaxed">
+                    {task.description}
+                  </p>
+                </div>
+
+                {/* Action Button */}
+                <Link href={task.route} className="flex-shrink-0">
+                  <Button
+                    variant={task.status === 'completed' ? 'outline' : 'default'}
+                    size="default"
                     className={cn(
-                      'inline-flex items-center px-2 py-0.5 rounded text-xs font-medium',
-                      task.required
-                        ? 'bg-red-100 text-red-700'
-                        : 'bg-blue-100 text-blue-700'
+                      'group-hover:translate-x-1 transition-transform font-medium',
+                      task.status === 'not-started' && 'bg-red-600 hover:bg-red-700 text-white',
+                      task.status === 'in-progress' && 'bg-blue-600 hover:bg-blue-700 text-white'
                     )}
                   >
-                    {task.badgeText}
-                  </span>
-                )}
+                    {config.buttonText}
+                    <ChevronRight className="ml-1 h-4 w-4" />
+                  </Button>
+                </Link>
               </div>
-              <p className="text-xs text-gray-600 mt-0.5">
-                {task.description}
-              </p>
             </div>
-
-            {/* Action Button */}
-            <Link href={task.route} className="flex-shrink-0">
-              <Button
-                variant={task.status === 'completed' ? 'outline' : 'default'}
-                size="sm"
-                className={cn(
-                  'group-hover:translate-x-0.5 transition-transform h-8 text-xs px-3',
-                  task.status === 'not-started' && 'bg-red-600 hover:bg-red-700 text-white',
-                  task.status === 'in-progress' && 'bg-blue-600 hover:bg-blue-700 text-white'
-                )}
-              >
-                {config.buttonText}
-                <ChevronRight className="ml-1 h-3.5 w-3.5" />
-              </Button>
-            </Link>
           </div>
         </CardContent>
       </Card>
