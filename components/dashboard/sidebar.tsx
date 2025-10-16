@@ -71,28 +71,8 @@ export function Sidebar() {
           isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         )}
       >
-        {/* Logo Section */}
-        <div className="bg-white border-b border-gray-200 px-4 py-3">
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-red-600 rounded flex items-center justify-center flex-shrink-0">
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                className="w-4 h-4"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M12 2L4 6v6c0 5.5 3.8 10.7 8 12 4.2-1.3 8-6.5 8-12V6l-8-4z"
-                  fill="white"
-                />
-              </svg>
-            </div>
-            <span className="text-gray-900 font-medium text-sm">lightspeed</span>
-          </div>
-        </div>
-
         {/* Navigation */}
-        <nav className="py-2 overflow-y-auto h-[calc(100%-60px)]">
+        <nav className="py-2 overflow-y-auto h-full">
           {navItems.map((item) => {
             const isActive = pathname === item.href;
             const Icon = item.icon;

@@ -20,21 +20,12 @@ export function Header({ userName = 'User' }: HeaderProps) {
     <header className="fixed top-0 left-0 right-0 h-14 bg-black z-50 border-b border-gray-800">
       <div className="h-full px-6 flex items-center justify-between">
         {/* Logo */}
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 bg-red-600 rounded flex items-center justify-center flex-shrink-0">
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              className="w-4 h-4"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M12 2L4 6v6c0 5.5 3.8 10.7 8 12 4.2-1.3 8-6.5 8-12V6l-8-4z"
-                fill="white"
-              />
-            </svg>
-          </div>
-          <span className="text-white font-medium text-base">lightspeed</span>
+        <div className="flex items-center">
+          <img
+            src="/lightspeed-logo-white.png"
+            alt="Lightspeed"
+            className="h-5"
+          />
         </div>
 
         {/* Right Section */}
