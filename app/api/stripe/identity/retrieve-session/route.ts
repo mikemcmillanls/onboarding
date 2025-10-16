@@ -43,8 +43,6 @@ export async function GET(req: NextRequest) {
         } : null,
         // ID number (may contain SSN or driver's license number)
         id_number: outputs.id_number || '',
-        // Document type
-        document_type: outputs.document?.type || null,
       };
     }
 
