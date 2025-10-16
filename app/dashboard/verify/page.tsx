@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { ArrowLeft, ArrowRight, Check, Shield } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, Shield, Scan, CheckCircle2, XCircle, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { US_STATES, BUSINESS_CATEGORIES, BUSINESS_STRUCTURES } from '@/lib/merchant-mock-data';
 import { MerchantStorage } from '@/lib/merchant-storage';
@@ -95,8 +95,12 @@ const ROLE_OPTIONS = [
 
 export default function VerifyPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [currentStep, setCurrentStep] = useState<StepNumber>(1);
   const [loading, setLoading] = useState(true);
+  const [stripeIdentitySessionId, setStripeIdentitySessionId] = useState<string | null>(null);
+  const [stripeIdentityStatus, setStripeIdentityStatus] = useState<'pending' | 'verified' | 'requires_input' | 'canceled' | null>(null);
+  const [isLoadingStripeIdentity, setIsLoadingStripeIdentity] = useState(false);
   const [formData, setFormData] = useState<VerificationFormData>({
     // Individual KYC
     firstName: '',
@@ -138,6 +142,14 @@ export default function VerifyPage() {
   useEffect(() => {
     loadMerchantData();
   }, []);
+
+  // Handle Stripe Identity return
+  useEffect(() => {
+    const sessionId = searchParams.get('session_id');
+    if (sessionId) {
+      handleStripeIdentityReturn(sessionId);
+    }
+  }, [searchParams]);
 
   // Scroll to top when step changes
   useEffect(() => {
@@ -244,6 +256,103 @@ export default function VerifyPage() {
         delete newErrors[field];
         return newErrors;
       });
+    }
+  };
+
+  // Launch Stripe Identity verification
+  const launchStripeIdentity = async () => {
+    try {
+      setIsLoadingStripeIdentity(true);
+
+      const response = await fetch('/api/stripe/identity/create-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          merchantId: 'temp-merchant-' + Date.now(),
+          email: formData.email,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          dateOfBirth: formData.dateOfBirth,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to create verification session');
+      }
+
+      setStripeIdentitySessionId(data.sessionId);
+      setStripeIdentityStatus('pending');
+
+      // Redirect to Stripe hosted verification page
+      window.location.href = data.url;
+    } catch (error) {
+      console.error('Error launching Stripe Identity:', error);
+      alert('Failed to start identity verification. Please try manual entry instead.');
+      setIsLoadingStripeIdentity(false);
+    }
+  };
+
+  // Handle return from Stripe Identity
+  const handleStripeIdentityReturn = async (sessionId: string) => {
+    try {
+      setIsLoadingStripeIdentity(true);
+
+      const response = await fetch(`/api/stripe/identity/retrieve-session?session_id=${sessionId}`);
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to retrieve verification results');
+      }
+
+      setStripeIdentitySessionId(data.sessionId);
+      setStripeIdentityStatus(data.status);
+
+      // Auto-populate form if verification succeeded
+      if (data.status === 'verified' && data.verifiedData) {
+        const verified = data.verifiedData;
+
+        // Auto-populate address fields
+        if (verified.address) {
+          setFormData(prev => ({
+            ...prev,
+            homeAddress: {
+              street: verified.address.line1 || '',
+              city: verified.address.city || '',
+              state: verified.address.state || '',
+              zipCode: verified.address.postal_code || '',
+            },
+          }));
+        }
+
+        // Auto-populate SSN last 4 if available
+        if (verified.id_number) {
+          const ssnLast4 = verified.id_number.slice(-4);
+          setFormData(prev => ({
+            ...prev,
+            ssnLast4: ssnLast4,
+          }));
+        }
+
+        // Clear any errors since fields are now filled
+        setErrors({});
+
+        console.log('✅ Stripe Identity verification successful - fields auto-populated');
+      } else if (data.status === 'requires_input') {
+        console.log('⚠️ Verification requires additional input - showing manual entry');
+      } else if (data.status === 'canceled') {
+        console.log('❌ Verification was canceled - showing manual entry');
+      }
+
+      // Remove session_id from URL
+      const url = new URL(window.location.href);
+      url.searchParams.delete('session_id');
+      window.history.replaceState({}, '', url);
+    } catch (error) {
+      console.error('Error handling Stripe Identity return:', error);
+    } finally {
+      setIsLoadingStripeIdentity(false);
     }
   };
 
@@ -514,44 +623,160 @@ export default function VerifyPage() {
           {currentStep === 2 && (
             <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.3 }} className="space-y-6">
               <div className="text-center mb-8">
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">Your home address</h2>
-                <p className="text-gray-600">We use this to verify your identity through credit bureaus</p>
+                <h2 className="text-3xl font-bold text-gray-900 mb-2">Verify your identity</h2>
+                <p className="text-gray-600">Scan your ID to auto-fill your address and verify your identity</p>
               </div>
+
+              {/* Stripe Identity Status Messages */}
+              {stripeIdentityStatus === 'verified' && (
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-start gap-3">
+                  <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-medium text-green-900">Identity verified successfully!</p>
+                    <p className="text-sm text-green-700">Your information has been auto-populated below. Please review and edit if needed.</p>
+                  </div>
+                </div>
+              )}
+
+              {stripeIdentityStatus === 'requires_input' && (
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-start gap-3">
+                  <XCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-medium text-amber-900">Additional information needed</p>
+                    <p className="text-sm text-amber-700">We couldn&apos;t automatically verify your ID. Please enter your information manually below.</p>
+                  </div>
+                </div>
+              )}
+
+              {stripeIdentityStatus === 'canceled' && (
+                <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 flex items-start gap-3">
+                  <XCircle className="w-5 h-5 text-gray-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-medium text-gray-900">Verification canceled</p>
+                    <p className="text-sm text-gray-700">No problem! You can enter your information manually below or try scanning your ID again.</p>
+                  </div>
+                </div>
+              )}
+
               <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 space-y-6">
-                <div className="space-y-2">
-                  <Label htmlFor="street">Street Address *</Label>
-                  <Input id="street" value={formData.homeAddress.street} onChange={(e) => updateField('homeAddress.street', e.target.value)} placeholder="123 Main Street" className={cn(errors['homeAddress.street'] && 'border-red-500')} />
-                  {errors['homeAddress.street'] && <p className="text-sm text-red-600">{errors['homeAddress.street']}</p>}
-                </div>
-                <div className="grid grid-cols-2 gap-4">
+                {/* Stripe Identity Button */}
+                {!stripeIdentityStatus && (
+                  <div className="space-y-4">
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 space-y-4">
+                      <div className="flex items-start gap-3">
+                        <Scan className="w-6 h-6 text-blue-600 flex-shrink-0" />
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-blue-900 mb-1">Quick verification with ID scan</h3>
+                          <p className="text-sm text-blue-700 mb-4">
+                            Scan your driver&apos;s license, passport, or state ID to automatically fill your address and SSN. Takes about 45 seconds.
+                          </p>
+                          <ul className="text-sm text-blue-700 space-y-1 mb-4">
+                            <li>✓ Auto-fills address from your ID</li>
+                            <li>✓ Verifies identity with selfie match</li>
+                            <li>✓ Faster than manual entry</li>
+                          </ul>
+                          <Button
+                            onClick={launchStripeIdentity}
+                            disabled={isLoadingStripeIdentity}
+                            className="w-full bg-blue-600 hover:bg-blue-700"
+                          >
+                            {isLoadingStripeIdentity ? (
+                              <>
+                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                Loading...
+                              </>
+                            ) : (
+                              <>
+                                <Scan className="w-4 h-4 mr-2" />
+                                Scan My ID
+                              </>
+                            )}
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="relative">
+                      <div className="absolute inset-0 flex items-center">
+                        <div className="w-full border-t border-gray-200"></div>
+                      </div>
+                      <div className="relative flex justify-center text-sm">
+                        <span className="px-4 bg-white text-gray-500">Or enter manually</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Manual Entry Form (always visible) */}
+                <div className="space-y-6">
                   <div className="space-y-2">
-                    <Label htmlFor="city">City *</Label>
-                    <Input id="city" value={formData.homeAddress.city} onChange={(e) => updateField('homeAddress.city', e.target.value)} className={cn(errors['homeAddress.city'] && 'border-red-500')} />
-                    {errors['homeAddress.city'] && <p className="text-sm text-red-600">{errors['homeAddress.city']}</p>}
+                    <Label htmlFor="street">Street Address *</Label>
+                    <Input
+                      id="street"
+                      value={formData.homeAddress.street}
+                      onChange={(e) => updateField('homeAddress.street', e.target.value)}
+                      placeholder="123 Main Street"
+                      className={cn(errors['homeAddress.street'] && 'border-red-500')}
+                      disabled={isLoadingStripeIdentity}
+                    />
+                    {errors['homeAddress.street'] && <p className="text-sm text-red-600">{errors['homeAddress.street']}</p>}
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="city">City *</Label>
+                      <Input
+                        id="city"
+                        value={formData.homeAddress.city}
+                        onChange={(e) => updateField('homeAddress.city', e.target.value)}
+                        className={cn(errors['homeAddress.city'] && 'border-red-500')}
+                        disabled={isLoadingStripeIdentity}
+                      />
+                      {errors['homeAddress.city'] && <p className="text-sm text-red-600">{errors['homeAddress.city']}</p>}
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="state">State *</Label>
+                      <Select
+                        value={formData.homeAddress.state}
+                        onValueChange={(value) => updateField('homeAddress.state', value)}
+                        disabled={isLoadingStripeIdentity}
+                      >
+                        <SelectTrigger className={cn(errors['homeAddress.state'] && 'border-red-500')}>
+                          <SelectValue placeholder="Select state" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {US_STATES.map((state) => <SelectItem key={state.value} value={state.value}>{state.label}</SelectItem>)}
+                        </SelectContent>
+                      </Select>
+                      {errors['homeAddress.state'] && <p className="text-sm text-red-600">{errors['homeAddress.state']}</p>}
+                    </div>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="state">State *</Label>
-                    <Select value={formData.homeAddress.state} onValueChange={(value) => updateField('homeAddress.state', value)}>
-                      <SelectTrigger className={cn(errors['homeAddress.state'] && 'border-red-500')}>
-                        <SelectValue placeholder="Select state" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {US_STATES.map((state) => <SelectItem key={state.value} value={state.value}>{state.label}</SelectItem>)}
-                      </SelectContent>
-                    </Select>
-                    {errors['homeAddress.state'] && <p className="text-sm text-red-600">{errors['homeAddress.state']}</p>}
+                    <Label htmlFor="zipCode">ZIP Code *</Label>
+                    <Input
+                      id="zipCode"
+                      value={formData.homeAddress.zipCode}
+                      onChange={(e) => updateField('homeAddress.zipCode', e.target.value)}
+                      placeholder="12345"
+                      maxLength={5}
+                      className={cn(errors['homeAddress.zipCode'] && 'border-red-500')}
+                      disabled={isLoadingStripeIdentity}
+                    />
+                    {errors['homeAddress.zipCode'] && <p className="text-sm text-red-600">{errors['homeAddress.zipCode']}</p>}
                   </div>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="zipCode">ZIP Code *</Label>
-                  <Input id="zipCode" value={formData.homeAddress.zipCode} onChange={(e) => updateField('homeAddress.zipCode', e.target.value)} placeholder="12345" maxLength={5} className={cn(errors['homeAddress.zipCode'] && 'border-red-500')} />
-                  {errors['homeAddress.zipCode'] && <p className="text-sm text-red-600">{errors['homeAddress.zipCode']}</p>}
-                </div>
-                <div className="pt-6 border-t space-y-2">
-                  <Label htmlFor="ssnLast4">Last 4 Digits of SSN *</Label>
-                  <Input id="ssnLast4" type="password" value={formData.ssnLast4} onChange={(e) => updateField('ssnLast4', e.target.value)} placeholder="••••" maxLength={4} className={cn(errors.ssnLast4 && 'border-red-500')} />
-                  <p className="text-xs text-gray-500">Used for identity verification. We&apos;ll only ask for your full SSN if automated verification fails.</p>
-                  {errors.ssnLast4 && <p className="text-sm text-red-600">{errors.ssnLast4}</p>}
+                  <div className="pt-6 border-t space-y-2">
+                    <Label htmlFor="ssnLast4">Last 4 Digits of SSN *</Label>
+                    <Input
+                      id="ssnLast4"
+                      type="password"
+                      value={formData.ssnLast4}
+                      onChange={(e) => updateField('ssnLast4', e.target.value)}
+                      placeholder="••••"
+                      maxLength={4}
+                      className={cn(errors.ssnLast4 && 'border-red-500')}
+                      disabled={isLoadingStripeIdentity}
+                    />
+                    <p className="text-xs text-gray-500">Used for identity verification. We&apos;ll only ask for your full SSN if automated verification fails.</p>
+                    {errors.ssnLast4 && <p className="text-sm text-red-600">{errors.ssnLast4}</p>}
+                  </div>
                 </div>
               </div>
             </motion.div>
