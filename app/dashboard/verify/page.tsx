@@ -403,9 +403,14 @@ export default function VerifyPage() {
               <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 space-y-6">
                 <div className="space-y-4">
                   <div className="flex justify-between py-2 border-b"><span className="text-gray-600">Name:</span><span className="font-medium">{formData.firstName} {formData.lastName}</span></div>
+                  <div className="flex justify-between py-2 border-b"><span className="text-gray-600">Date of Birth:</span><span className="font-medium">{formData.dateOfBirth ? new Date(formData.dateOfBirth).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : ''}</span></div>
                   <div className="flex justify-between py-2 border-b"><span className="text-gray-600">Email:</span><span className="font-medium">{formData.email}</span></div>
-                  <div className="flex justify-between py-2 border-b"><span className="text-gray-600">Role:</span><span className="font-medium">{ROLE_OPTIONS.find(r => r.value === formData.title)?.label}</span></div>
+                  <div className="flex justify-between py-2 border-b"><span className="text-gray-600">Phone:</span><span className="font-medium">{formData.phone}</span></div>
                   <div className="flex justify-between py-2 border-b"><span className="text-gray-600">Address:</span><span className="font-medium text-right">{formData.homeAddress.street}, {formData.homeAddress.city}, {formData.homeAddress.state} {formData.homeAddress.zipCode}</span></div>
+                  <div className="flex justify-between py-2 border-b"><span className="text-gray-600">Role:</span><span className="font-medium">{ROLE_OPTIONS.find(r => r.value === formData.title)?.label}</span></div>
+                  {isOwnerRole && formData.ownershipPercentage && (
+                    <div className="flex justify-between py-2 border-b"><span className="text-gray-600">Ownership:</span><span className="font-medium">{formData.ownershipPercentage}%</span></div>
+                  )}
                 </div>
                 <div className="pt-6 border-t space-y-4">
                   <div className="flex items-start gap-3">
