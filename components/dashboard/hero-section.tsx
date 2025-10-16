@@ -8,34 +8,28 @@ interface HeroSectionProps {
   total: number;
 }
 
-export function HeroSection({ completed, total }: HeroSectionProps) {
+export function HeroSection({ businessName, completed, total }: HeroSectionProps) {
   const isComplete = completed === total;
-  const remaining = total - completed;
 
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
-      className="bg-black text-white rounded-lg px-6 py-6 md:px-8 md:py-7 shadow-sm"
+      className="text-center py-8"
     >
-      <h1 className="text-xl md:text-2xl font-bold mb-2">
+      <h1 className="text-3xl font-bold text-gray-900 mb-2">
         {isComplete ? (
-          <>You&apos;re ready to go!</>
+          <>You&apos;re all set, {businessName}!</>
         ) : (
-          <>Get set up to check out customers</>
+          <>Hi {businessName}, let&apos;s get your store set up!</>
         )}
       </h1>
-      <p className="text-sm md:text-base text-gray-300">
+      <p className="text-base text-gray-600">
         {isComplete ? (
-          'Your Lightspeed POS and Payments are ready to accept payments.'
+          'Your store is ready to start accepting payments.'
         ) : (
-          <>
-            Complete these quick steps to start accepting payments with Lightspeed.{' '}
-            <span className="text-white font-medium">
-              {remaining} task{remaining !== 1 ? 's' : ''} remaining
-            </span>
-          </>
+          'Follow our lead to get the basics in order.'
         )}
       </p>
     </motion.div>

@@ -233,7 +233,7 @@ export default function DashboardPage() {
   const totalTasks = checklistTasks.length;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Header */}
       <Header userName={userName} />
 
@@ -241,7 +241,7 @@ export default function DashboardPage() {
       <Sidebar />
 
       {/* Main Content */}
-      <main className="lg:ml-[185px] min-h-screen pt-14">
+      <main className="lg:ml-[185px] min-h-screen pt-14 bg-[#FAFAFA]">
         <div className="max-w-6xl mx-auto px-6 py-8 md:px-8 md:py-10 lg:px-12 lg:py-12">
           {/* Hero Section */}
           <div className="mb-10">
