@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
+import { Header } from '@/components/dashboard/header';
 import { Sidebar } from '@/components/dashboard/sidebar';
 import { HeroSection } from '@/components/dashboard/hero-section';
 import { ChecklistCard } from '@/components/dashboard/checklist-card';
@@ -225,16 +226,22 @@ export default function DashboardPage() {
   }
 
   const businessName = merchant.signUpData?.businessName || 'Your Business';
+  const userName = merchant.signUpData?.firstName
+    ? `${merchant.signUpData.firstName} ${merchant.signUpData.lastName || ''}`
+    : 'User';
   const completedTasks = checklistTasks.filter(t => t.status === 'completed').length;
   const totalTasks = checklistTasks.length;
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <Header userName={userName} />
+
       {/* Sidebar */}
-      <Sidebar businessName={businessName} />
+      <Sidebar />
 
       {/* Main Content */}
-      <main className="lg:ml-[240px] min-h-screen">
+      <main className="lg:ml-[185px] min-h-screen pt-14">
         <div className="max-w-6xl mx-auto px-6 py-8 md:px-8 md:py-10 lg:px-12 lg:py-12">
           {/* Hero Section */}
           <div className="mb-10">

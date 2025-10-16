@@ -3,58 +3,49 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import {
   Home,
   ShoppingCart,
-  CreditCard,
+  Globe,
+  BarChart3,
+  Tag,
+  Wrench,
+  Package,
+  Users,
   Settings,
-  HelpCircle,
-  Bell,
-  User,
   Menu,
   X,
-  Package,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-
-interface SidebarProps {
-  businessName: string;
-}
 
 interface NavItem {
   name: string;
   href: string;
   icon: React.ElementType;
-  badge?: number;
 }
 
 const navItems: NavItem[] = [
   { name: 'Home', href: '/dashboard', icon: Home },
-  { name: 'POS Setup', href: '/dashboard/pos-setup', icon: ShoppingCart },
-  { name: 'Hardware & Checkout', href: '/dashboard/hardware', icon: Package },
-  { name: 'Bank Setup', href: '/dashboard/payments', icon: CreditCard },
-  { name: 'Settings', href: '/dashboard/settings', icon: Settings },
+  { name: 'Sell', href: '/dashboard/sell', icon: ShoppingCart },
+  { name: 'Online', href: '/dashboard/online', icon: Globe },
+  { name: 'Sales', href: '/dashboard/sales', icon: BarChart3 },
+  { name: 'Reporting', href: '/dashboard/reporting', icon: BarChart3 },
+  { name: 'Catalog', href: '/dashboard/catalog', icon: Tag },
+  { name: 'Services', href: '/dashboard/services', icon: Wrench },
+  { name: 'Inventory', href: '/dashboard/inventory', icon: Package },
+  { name: 'Customers', href: '/dashboard/customers', icon: Users },
+  { name: 'Setup', href: '/dashboard/setup', icon: Settings },
 ];
 
-export function Sidebar({ businessName }: SidebarProps) {
+export function Sidebar() {
   const pathname = usePathname();
-  const isCollapsed = false; // Can be made dynamic later
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   return (
     <>
       {/* Mobile Menu Button */}
-      <div className="lg:hidden fixed top-4 left-4 z-50">
+      <div className="lg:hidden fixed top-16 left-4 z-40">
         <Button
           variant="outline"
           size="icon"
@@ -68,58 +59,40 @@ export function Sidebar({ businessName }: SidebarProps) {
       {/* Overlay for mobile */}
       {isMobileOpen && (
         <div
-          className="lg:hidden fixed inset-0 bg-black/50 z-40"
+          className="lg:hidden fixed inset-0 bg-black/50 z-30 mt-14"
           onClick={() => setIsMobileOpen(false)}
         />
       )}
 
       {/* Sidebar */}
-      <motion.aside
-        initial={false}
-        animate={{
-          width: isCollapsed ? 80 : 240,
-        }}
-        transition={{ duration: 0.3, ease: 'easeInOut' }}
+      <aside
         className={cn(
-          'fixed left-0 top-0 h-screen bg-gray-900 text-white z-40 flex flex-col transition-transform',
+          'fixed left-0 top-14 h-[calc(100vh-3.5rem)] w-[185px] bg-[#F5F5F5] border-r border-gray-200 z-30 transition-transform',
           isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         )}
-        style={{ width: isCollapsed ? 80 : 240 }}
       >
-        {/* Logo & Branding */}
-        <div className="p-6 border-b border-gray-800">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-red-600 rounded-lg flex items-center justify-center flex-shrink-0">
-              <span className="text-white font-bold text-xl">L</span>
-            </div>
-            {!isCollapsed && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.1 }}
+        {/* Logo Section */}
+        <div className="bg-white border-b border-gray-200 px-4 py-3">
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 bg-red-600 rounded flex items-center justify-center flex-shrink-0">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                className="w-4 h-4"
+                xmlns="http://www.w3.org/2000/svg"
               >
-                <h1 className="text-sm font-bold">Lightspeed</h1>
-                <p className="text-xs text-gray-400">POS & Payments</p>
-              </motion.div>
-            )}
+                <path
+                  d="M12 2L4 6v6c0 5.5 3.8 10.7 8 12 4.2-1.3 8-6.5 8-12V6l-8-4z"
+                  fill="white"
+                />
+              </svg>
+            </div>
+            <span className="text-gray-900 font-medium text-sm">lightspeed</span>
           </div>
         </div>
 
-        {/* Business Name */}
-        {!isCollapsed && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.1 }}
-            className="px-6 py-4 border-b border-gray-800"
-          >
-            <p className="text-xs text-gray-400 mb-1">Business</p>
-            <p className="text-sm font-semibold truncate">{businessName}</p>
-          </motion.div>
-        )}
-
         {/* Navigation */}
-        <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+        <nav className="py-2 overflow-y-auto h-[calc(100%-60px)]">
           {navItems.map((item) => {
             const isActive = pathname === item.href;
             const Icon = item.icon;
@@ -130,96 +103,23 @@ export function Sidebar({ businessName }: SidebarProps) {
                 href={item.href}
                 onClick={() => setIsMobileOpen(false)}
                 className={cn(
-                  'flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors group relative',
+                  'flex items-center gap-3 px-4 py-2.5 text-sm transition-colors relative',
                   isActive
-                    ? 'bg-red-600 text-white'
-                    : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                    ? 'bg-gray-200 text-gray-900 font-medium'
+                    : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
                 )}
               >
-                <Icon className="h-5 w-5 flex-shrink-0" />
-                {!isCollapsed && (
-                  <motion.span
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.1 }}
-                    className="text-sm font-medium"
-                  >
-                    {item.name}
-                  </motion.span>
+                {/* Blue active indicator bar */}
+                {isActive && (
+                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-600" />
                 )}
-                {item.badge && !isCollapsed && (
-                  <span className="ml-auto bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
-                    {item.badge}
-                  </span>
-                )}
+                <Icon className="h-4 w-4 flex-shrink-0" />
+                <span>{item.name}</span>
               </Link>
             );
           })}
         </nav>
-
-        {/* Bottom Section */}
-        <div className="border-t border-gray-800 p-3 space-y-2">
-          {/* Help */}
-          <Button
-            variant="ghost"
-            size={isCollapsed ? 'icon' : 'sm'}
-            className="w-full justify-start text-gray-300 hover:text-white hover:bg-gray-800"
-          >
-            <HelpCircle className="h-5 w-5 flex-shrink-0" />
-            {!isCollapsed && <span className="ml-3">Help & Support</span>}
-          </Button>
-
-          {/* Notifications */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size={isCollapsed ? 'icon' : 'sm'}
-                className="w-full justify-start text-gray-300 hover:text-white hover:bg-gray-800 relative"
-              >
-                <Bell className="h-5 w-5 flex-shrink-0" />
-                {!isCollapsed && <span className="ml-3">Notifications</span>}
-                <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-80">
-              <DropdownMenuLabel>Notifications</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <div className="flex flex-col gap-1">
-                  <p className="text-sm font-medium">Welcome to Lightspeed!</p>
-                  <p className="text-xs text-muted-foreground">
-                    Complete your setup to start accepting payments
-                  </p>
-                </div>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          {/* User Profile */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size={isCollapsed ? 'icon' : 'sm'}
-                className="w-full justify-start text-gray-300 hover:text-white hover:bg-gray-800"
-              >
-                <User className="h-5 w-5 flex-shrink-0" />
-                {!isCollapsed && <span className="ml-3">Profile</span>}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>Profile Settings</DropdownMenuItem>
-              <DropdownMenuItem>Billing</DropdownMenuItem>
-              <DropdownMenuItem>Team</DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-red-600">Sign Out</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </motion.aside>
+      </aside>
     </>
   );
 }
