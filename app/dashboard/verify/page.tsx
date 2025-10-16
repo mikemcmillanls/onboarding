@@ -1026,12 +1026,12 @@ export default function VerifyPage() {
             <motion.div key="step8" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.3 }} className="space-y-6">
               <div className="text-center mb-8">
                 <h2 className="text-3xl font-bold text-gray-900 mb-2">Connect your bank account (Optional)</h2>
-                <p className="text-gray-600">You're almost done! Connect your bank account to receive automatic payouts from your sales.</p>
+                <p className="text-gray-600">You&apos;re almost done! Connect your bank account to receive automatic payouts from your sales.</p>
               </div>
               <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 space-y-6">
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
                   <p className="text-sm text-blue-900">
-                    <strong>Optional step:</strong> You can skip this step and add it later. You'll still be able to accept payments - funds will accumulate in your Stripe balance until you add a bank account.
+                    <strong>Optional step:</strong> You can skip this step and add it later. You&apos;ll still be able to accept payments - funds will accumulate in your Stripe balance until you add a bank account.
                   </p>
                 </div>
 
@@ -1040,7 +1040,7 @@ export default function VerifyPage() {
                   <div className="space-y-3">
                     <div className="flex items-center space-x-3">
                       <input type="radio" id="addBankNo" name="skipBankAccount" checked={formData.skipBankAccount} onChange={() => updateField('skipBankAccount', true)} className="w-4 h-4 text-red-600" />
-                      <label htmlFor="addBankNo" className="text-sm cursor-pointer">I'll add this later (skip)</label>
+                      <label htmlFor="addBankNo" className="text-sm cursor-pointer">I&apos;ll add this later (skip)</label>
                     </div>
                     <div className="flex items-center space-x-3">
                       <input type="radio" id="addBankYes" name="skipBankAccount" checked={!formData.skipBankAccount} onChange={() => updateField('skipBankAccount', false)} className="w-4 h-4 text-red-600" />
@@ -1110,7 +1110,7 @@ export default function VerifyPage() {
 
                     <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
                       <p className="text-sm text-amber-900">
-                        <strong>Micro-deposit verification:</strong> Stripe will send 2 small deposits ($0.01-$0.99) to your account within 1-2 business days. You'll need to confirm the amounts to enable payouts.
+                        <strong>Micro-deposit verification:</strong> Stripe will send 2 small deposits ($0.01-$0.99) to your account within 1-2 business days. You&apos;ll need to confirm the amounts to enable payouts.
                       </p>
                     </div>
                   </motion.div>
@@ -1119,7 +1119,7 @@ export default function VerifyPage() {
                 {formData.skipBankAccount && (
                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                     <p className="text-sm text-blue-900">
-                      <strong>No problem!</strong> You can add your bank account later from your dashboard. You'll still be able to accept payments - funds will accumulate safely in your Stripe balance.
+                      <strong>No problem!</strong> You can add your bank account later from your dashboard. You&apos;ll still be able to accept payments - funds will accumulate safely in your Stripe balance.
                     </p>
                   </div>
                 )}
