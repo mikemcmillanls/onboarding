@@ -16,16 +16,16 @@ export function HeroSection({ businessName, completed, total }: HeroSectionProps
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
-      className="text-center py-8"
+      className="text-center py-4"
     >
-      <h1 className="text-3xl font-bold text-gray-900 mb-2">
+      <h1 className="text-2xl font-bold text-gray-900 mb-1.5">
         {isComplete ? (
           <>You&apos;re all set, {businessName}!</>
         ) : (
           <>Hi {businessName}, let&apos;s get your store set up!</>
         )}
       </h1>
-      <p className="text-base text-gray-600">
+      <p className="text-sm text-gray-600">
         {isComplete ? (
           'Your store is ready to start accepting payments.'
         ) : (

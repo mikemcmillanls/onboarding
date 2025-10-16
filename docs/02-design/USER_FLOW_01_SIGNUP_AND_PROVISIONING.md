@@ -63,12 +63,16 @@ The signup flow uses a 2-page wizard pattern with client-side state management. 
 **Component**: `AccountForm` (`components/get-started/account-form.tsx`)
 
 **Data Collected**:
+- First Name
+- Last Name
 - Business Name
 - Email address
 - Password (minimum 8 characters)
 - Terms and conditions agreement
 
 **Validation Rules**:
+- First name: Required, non-empty
+- Last name: Required, non-empty
 - Business name: Required, non-empty
 - Email: Required, valid format (regex: `/^[^\s@]+@[^\s@]+\.[^\s@]+$/`)
 - Password: Required, minimum 8 characters

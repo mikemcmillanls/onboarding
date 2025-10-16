@@ -12,14 +12,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, ArrowRight, Loader2 } from 'lucide-react';
+import { ArrowLeft, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { BUSINESS_CATEGORIES, REVENUE_RANGES, US_STATES } from '@/lib/merchant-mock-data';
+import { BUSINESS_CATEGORIES, REVENUE_RANGES } from '@/lib/merchant-mock-data';
+import { MockAddressAutocomplete } from './mock-address-autocomplete';
 
 export interface BusinessFormData {
   businessCategory: string;
-  businessWebsite: string; // For future TrueBiz verification
+  businessWebsite: string;
   businessAddress: {
     street: string;
     city: string;
@@ -49,6 +49,9 @@ export function BusinessForm({ onSubmit, onBack, initialData }: BusinessFormProp
     annualRevenue: initialData?.annualRevenue || '',
     numberOfLocations: initialData?.numberOfLocations || 1,
   });
+
+  // Separate state for the address input display
+  const [addressInputValue, setAddressInputValue] = useState('');
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
@@ -89,11 +92,9 @@ export function BusinessForm({ onSubmit, onBack, initialData }: BusinessFormProp
       newErrors.businessCategory = 'Business category is required';
     }
 
-    // Website URL validation (required for TrueBiz verification)
     if (!formData.businessWebsite.trim()) {
       newErrors.businessWebsite = 'Business website is required';
     } else {
-      // Basic URL validation
       const urlPattern = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
       if (!urlPattern.test(formData.businessWebsite)) {
         newErrors.businessWebsite = 'Please enter a valid website URL';
@@ -146,7 +147,6 @@ export function BusinessForm({ onSubmit, onBack, initialData }: BusinessFormProp
 
     if (validateAll()) {
       setIsSubmitting(true);
-      // Add a small delay to show the loading state
       await new Promise(resolve => setTimeout(resolve, 800));
       onSubmit(formData);
     }
@@ -157,307 +157,250 @@ export function BusinessForm({ onSubmit, onBack, initialData }: BusinessFormProp
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -20 }}
-      transition={{ duration: 0.3 }}
+      transition={{ duration: 0.4 }}
+      className="w-full max-w-md mx-auto"
     >
-      <Card className="border-none shadow-lg">
-        <CardHeader className="space-y-1 pb-6">
-          <CardTitle className="text-2xl font-bold">Business Information</CardTitle>
-          <CardDescription className="text-base">
-            Tell us about your business to help us tailor your experience
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="businessCategory" className="text-base">
-                  Business Category <span className="text-red-500">*</span>
-                </Label>
-                <Select
-                  value={formData.businessCategory}
-                  onValueChange={(value) => updateField('businessCategory', value)}
-                >
-                  <SelectTrigger
-                    className={cn(
-                      'h-11 text-base',
-                      touched.businessCategory && errors.businessCategory && 'border-red-500 focus:ring-red-500'
-                    )}
-                    onBlur={() => handleBlur('businessCategory')}
-                  >
-                    <SelectValue placeholder="Select your business type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {BUSINESS_CATEGORIES.map((cat) => (
-                      <SelectItem key={cat.value} value={cat.value}>
-                        {cat.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {touched.businessCategory && errors.businessCategory && (
-                  <motion.p
-                    initial={{ opacity: 0, y: -5 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="text-sm text-red-500"
-                  >
-                    {errors.businessCategory}
-                  </motion.p>
+      {/* Header Section */}
+      <div className="text-center mb-6">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          Business Information
+        </h1>
+        <p className="text-base text-gray-600">
+          Tell us about your business to help us tailor your experience
+        </p>
+      </div>
+
+      {/* Form Section */}
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Business Category */}
+        <div className="space-y-1.5">
+          <Label htmlFor="businessCategory" className="text-sm font-medium text-gray-700">
+            Business Category <span className="text-red-500">*</span>
+          </Label>
+          <Select
+            value={formData.businessCategory}
+            onValueChange={(value) => updateField('businessCategory', value)}
+          >
+            <SelectTrigger
+              className={cn(
+                'h-11 text-base border-gray-300 rounded-md',
+                touched.businessCategory && errors.businessCategory && 'border-red-500 focus:ring-red-500'
+              )}
+              onBlur={() => handleBlur('businessCategory')}
+            >
+              <SelectValue placeholder="Select your business type" />
+            </SelectTrigger>
+            <SelectContent>
+              {BUSINESS_CATEGORIES.map((cat) => (
+                <SelectItem key={cat.value} value={cat.value}>
+                  {cat.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {touched.businessCategory && errors.businessCategory && (
+            <motion.p
+              initial={{ opacity: 0, y: -5 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-sm text-red-600"
+            >
+              {errors.businessCategory}
+            </motion.p>
+          )}
+        </div>
+
+        {/* Business Website */}
+        <div className="space-y-1.5">
+          <Label htmlFor="businessWebsite" className="text-sm font-medium text-gray-700">
+            Business Website <span className="text-red-500">*</span>
+          </Label>
+          <Input
+            id="businessWebsite"
+            type="url"
+            value={formData.businessWebsite}
+            onChange={(e) => updateField('businessWebsite', e.target.value)}
+            onBlur={() => handleBlur('businessWebsite')}
+            className={cn(
+              'h-11 text-base border-gray-300 rounded-md',
+              touched.businessWebsite && errors.businessWebsite && 'border-red-500 focus-visible:ring-red-500'
+            )}
+            placeholder="https://yourbusiness.com"
+          />
+          <p className="text-xs text-gray-500">
+            We&apos;ll use this to verify your business information
+          </p>
+          {touched.businessWebsite && errors.businessWebsite && (
+            <motion.p
+              initial={{ opacity: 0, y: -5 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-sm text-red-600"
+            >
+              {errors.businessWebsite}
+            </motion.p>
+          )}
+        </div>
+
+        {/* Business Address - Single Field */}
+        <div className="space-y-1.5">
+          <Label htmlFor="businessAddress" className="text-sm font-medium text-gray-700">
+            Business Address <span className="text-red-500">*</span>
+          </Label>
+          <MockAddressAutocomplete
+            value={addressInputValue}
+            onChange={(value) => {
+              // Update the display value as user types
+              setAddressInputValue(value);
+              // Also update the street field for validation
+              updateField('businessAddress.street', value);
+            }}
+            onBlur={() => {
+              handleBlur('businessAddress.street');
+              handleBlur('businessAddress.city');
+              handleBlur('businessAddress.state');
+              handleBlur('businessAddress.zipCode');
+            }}
+            onAddressSelect={(address) => {
+              // Auto-fill all address fields from selection
+              setFormData(prev => ({
+                ...prev,
+                businessAddress: {
+                  street: address.street,
+                  city: address.city,
+                  state: address.state,
+                  zipCode: address.zipCode,
+                }
+              }));
+              // Update display value to show full formatted address
+              setAddressInputValue(`${address.street}, ${address.city}, ${address.state} ${address.zipCode}`);
+              // Clear any errors for auto-filled fields
+              setErrors(prev => {
+                const newErrors = { ...prev };
+                delete newErrors['businessAddress.street'];
+                delete newErrors['businessAddress.city'];
+                delete newErrors['businessAddress.state'];
+                delete newErrors['businessAddress.zipCode'];
+                return newErrors;
+              });
+            }}
+            placeholder="123 Main Street, New York, NY 10001"
+            className={cn(
+              'h-11 text-base border-gray-300 rounded-md',
+              (touched['businessAddress.street'] || touched['businessAddress.city'] || touched['businessAddress.state'] || touched['businessAddress.zipCode']) &&
+              (errors['businessAddress.street'] || errors['businessAddress.city'] || errors['businessAddress.state'] || errors['businessAddress.zipCode']) &&
+              'border-red-500 focus-visible:ring-red-500'
+            )}
+          />
+          {(touched['businessAddress.street'] || touched['businessAddress.city'] || touched['businessAddress.state'] || touched['businessAddress.zipCode']) &&
+            (errors['businessAddress.street'] || errors['businessAddress.city'] || errors['businessAddress.state'] || errors['businessAddress.zipCode']) && (
+            <motion.p
+              initial={{ opacity: 0, y: -5 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-sm text-red-600"
+            >
+              {errors['businessAddress.street'] || errors['businessAddress.city'] || errors['businessAddress.state'] || errors['businessAddress.zipCode']}
+            </motion.p>
+          )}
+        </div>
+
+        {/* Business Size Section */}
+        <div className="pt-3 space-y-4">
+          <h3 className="text-sm font-semibold text-gray-900">Business Size</h3>
+
+          {/* Annual Revenue */}
+          <div className="space-y-1.5">
+            <Label htmlFor="annualRevenue" className="text-sm font-medium text-gray-700">
+              Annual Revenue <span className="text-red-500">*</span>
+            </Label>
+            <Select
+              value={formData.annualRevenue}
+              onValueChange={(value) => updateField('annualRevenue', value)}
+            >
+              <SelectTrigger
+                className={cn(
+                  'h-11 text-base border-gray-300 rounded-md',
+                  touched.annualRevenue && errors.annualRevenue && 'border-red-500 focus:ring-red-500'
                 )}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="businessWebsite" className="text-base">
-                  Business Website <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id="businessWebsite"
-                  type="url"
-                  value={formData.businessWebsite}
-                  onChange={(e) => updateField('businessWebsite', e.target.value)}
-                  onBlur={() => handleBlur('businessWebsite')}
-                  className={cn(
-                    'h-11 text-base',
-                    touched.businessWebsite && errors.businessWebsite && 'border-red-500 focus-visible:ring-red-500'
-                  )}
-                  placeholder="https://yourbusiness.com"
-                />
-                <p className="text-sm text-muted-foreground">
-                  We&apos;ll use this to verify your business information
-                </p>
-                {touched.businessWebsite && errors.businessWebsite && (
-                  <motion.p
-                    initial={{ opacity: 0, y: -5 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="text-sm text-red-500"
-                  >
-                    {errors.businessWebsite}
-                  </motion.p>
-                )}
-              </div>
-
-              <div className="pt-2 border-t">
-                <h3 className="font-medium mb-4 text-base">Business Address</h3>
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="street" className="text-base">
-                      Street Address <span className="text-red-500">*</span>
-                    </Label>
-                    <Input
-                      id="street"
-                      value={formData.businessAddress.street}
-                      onChange={(e) => updateField('businessAddress.street', e.target.value)}
-                      onBlur={() => handleBlur('businessAddress.street')}
-                      className={cn(
-                        'h-11 text-base',
-                        touched['businessAddress.street'] && errors['businessAddress.street'] && 'border-red-500 focus-visible:ring-red-500'
-                      )}
-                      placeholder="123 Main Street"
-                    />
-                    {touched['businessAddress.street'] && errors['businessAddress.street'] && (
-                      <motion.p
-                        initial={{ opacity: 0, y: -5 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="text-sm text-red-500"
-                      >
-                        {errors['businessAddress.street']}
-                      </motion.p>
-                    )}
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="city" className="text-base">
-                        City <span className="text-red-500">*</span>
-                      </Label>
-                      <Input
-                        id="city"
-                        value={formData.businessAddress.city}
-                        onChange={(e) => updateField('businessAddress.city', e.target.value)}
-                        onBlur={() => handleBlur('businessAddress.city')}
-                        className={cn(
-                          'h-11 text-base',
-                          touched['businessAddress.city'] && errors['businessAddress.city'] && 'border-red-500 focus-visible:ring-red-500'
-                        )}
-                        placeholder="New York"
-                      />
-                      {touched['businessAddress.city'] && errors['businessAddress.city'] && (
-                        <motion.p
-                          initial={{ opacity: 0, y: -5 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="text-sm text-red-500"
-                        >
-                          {errors['businessAddress.city']}
-                        </motion.p>
-                      )}
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="state" className="text-base">
-                        State <span className="text-red-500">*</span>
-                      </Label>
-                      <Select
-                        value={formData.businessAddress.state}
-                        onValueChange={(value) => updateField('businessAddress.state', value)}
-                      >
-                        <SelectTrigger
-                          className={cn(
-                            'h-11 text-base',
-                            touched['businessAddress.state'] && errors['businessAddress.state'] && 'border-red-500 focus:ring-red-500'
-                          )}
-                          onBlur={() => handleBlur('businessAddress.state')}
-                        >
-                          <SelectValue placeholder="Select state" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {US_STATES.map((state) => (
-                            <SelectItem key={state.value} value={state.value}>
-                              {state.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      {touched['businessAddress.state'] && errors['businessAddress.state'] && (
-                        <motion.p
-                          initial={{ opacity: 0, y: -5 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="text-sm text-red-500"
-                        >
-                          {errors['businessAddress.state']}
-                        </motion.p>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="zipCode" className="text-base">
-                      ZIP Code <span className="text-red-500">*</span>
-                    </Label>
-                    <Input
-                      id="zipCode"
-                      value={formData.businessAddress.zipCode}
-                      onChange={(e) => updateField('businessAddress.zipCode', e.target.value)}
-                      onBlur={() => handleBlur('businessAddress.zipCode')}
-                      className={cn(
-                        'h-11 text-base',
-                        touched['businessAddress.zipCode'] && errors['businessAddress.zipCode'] && 'border-red-500 focus-visible:ring-red-500'
-                      )}
-                      placeholder="12345"
-                      maxLength={10}
-                    />
-                    {touched['businessAddress.zipCode'] && errors['businessAddress.zipCode'] && (
-                      <motion.p
-                        initial={{ opacity: 0, y: -5 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="text-sm text-red-500"
-                      >
-                        {errors['businessAddress.zipCode']}
-                      </motion.p>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              <div className="pt-2 border-t">
-                <h3 className="font-medium mb-4 text-base">Business Size</h3>
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="annualRevenue" className="text-base">
-                      Annual Revenue <span className="text-red-500">*</span>
-                    </Label>
-                    <Select
-                      value={formData.annualRevenue}
-                      onValueChange={(value) => updateField('annualRevenue', value)}
-                    >
-                      <SelectTrigger
-                        className={cn(
-                          'h-11 text-base',
-                          touched.annualRevenue && errors.annualRevenue && 'border-red-500 focus:ring-red-500'
-                        )}
-                        onBlur={() => handleBlur('annualRevenue')}
-                      >
-                        <SelectValue placeholder="Select your annual revenue" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {REVENUE_RANGES.map((range) => (
-                          <SelectItem key={range.value} value={range.value}>
-                            {range.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    {touched.annualRevenue && errors.annualRevenue && (
-                      <motion.p
-                        initial={{ opacity: 0, y: -5 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="text-sm text-red-500"
-                      >
-                        {errors.annualRevenue}
-                      </motion.p>
-                    )}
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="numberOfLocations" className="text-base">
-                      Number of Locations <span className="text-red-500">*</span>
-                    </Label>
-                    <Input
-                      id="numberOfLocations"
-                      type="number"
-                      min="1"
-                      value={formData.numberOfLocations}
-                      onChange={(e) => updateField('numberOfLocations', parseInt(e.target.value) || 1)}
-                      onBlur={() => handleBlur('numberOfLocations')}
-                      className={cn(
-                        'h-11 text-base',
-                        touched.numberOfLocations && errors.numberOfLocations && 'border-red-500 focus-visible:ring-red-500'
-                      )}
-                    />
-                    {touched.numberOfLocations && errors.numberOfLocations && (
-                      <motion.p
-                        initial={{ opacity: 0, y: -5 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="text-sm text-red-500"
-                      >
-                        {errors.numberOfLocations}
-                      </motion.p>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex gap-3 pt-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={onBack}
-                className="flex-1 h-12 text-base"
-                disabled={isSubmitting}
+                onBlur={() => handleBlur('annualRevenue')}
               >
-                <ArrowLeft className="mr-2 w-5 h-5" />
-                Back
-              </Button>
-              <Button
-                type="submit"
-                className="flex-1 h-12 text-base"
-                disabled={isSubmitting}
+                <SelectValue placeholder="Select your annual revenue" />
+              </SelectTrigger>
+              <SelectContent>
+                {REVENUE_RANGES.map((range) => (
+                  <SelectItem key={range.value} value={range.value}>
+                    {range.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {touched.annualRevenue && errors.annualRevenue && (
+              <motion.p
+                initial={{ opacity: 0, y: -5 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-sm text-red-600"
               >
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="mr-2 w-5 h-5 animate-spin" />
-                    Processing...
-                  </>
-                ) : (
-                  <>
-                    Continue to Setup
-                    <ArrowRight className="ml-2 w-5 h-5" />
-                  </>
-                )}
-              </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+                {errors.annualRevenue}
+              </motion.p>
+            )}
+          </div>
+
+          {/* Number of Locations */}
+          <div className="space-y-1.5">
+            <Label htmlFor="numberOfLocations" className="text-sm font-medium text-gray-700">
+              Number of Locations <span className="text-red-500">*</span>
+            </Label>
+            <Input
+              id="numberOfLocations"
+              type="number"
+              min="1"
+              value={formData.numberOfLocations}
+              onChange={(e) => updateField('numberOfLocations', parseInt(e.target.value) || 1)}
+              onBlur={() => handleBlur('numberOfLocations')}
+              className={cn(
+                'h-11 text-base border-gray-300 rounded-md',
+                touched.numberOfLocations && errors.numberOfLocations && 'border-red-500 focus-visible:ring-red-500'
+              )}
+              placeholder="1"
+            />
+            {touched.numberOfLocations && errors.numberOfLocations && (
+              <motion.p
+                initial={{ opacity: 0, y: -5 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-sm text-red-600"
+              >
+                {errors.numberOfLocations}
+              </motion.p>
+            )}
+          </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex gap-3 pt-4">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onBack}
+            className="h-11 px-6 text-base border-gray-300 rounded-md"
+            disabled={isSubmitting}
+          >
+            <ArrowLeft className="mr-2 w-4 h-4" />
+            Back
+          </Button>
+          <Button
+            type="submit"
+            className="flex-1 h-11 text-base bg-red-600 hover:bg-red-700 text-white rounded-md font-medium"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? (
+              <>
+                <Loader2 className="mr-2 w-4 h-4 animate-spin" />
+                Processing...
+              </>
+            ) : (
+              'Continue to Dashboard'
+            )}
+          </Button>
+        </div>
+      </form>
     </motion.div>
   );
 }

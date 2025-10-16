@@ -50,17 +50,17 @@ export function ChecklistCard({ task, index }: ChecklistCardProps) {
           task.status === 'completed' && 'bg-gray-50'
         )}
       >
-        <CardContent className="p-6">
-          <div className="flex items-start gap-4">
+        <CardContent className="p-5">
+          <div className="flex items-start gap-3">
             {/* Status Icon */}
-            <div className="flex-shrink-0 pt-1">
+            <div className="flex-shrink-0 pt-0.5">
               <div className={cn(
-                'w-6 h-6 rounded-full flex items-center justify-center',
+                'w-5 h-5 rounded-full flex items-center justify-center',
                 task.status === 'not-started' && 'bg-gray-100',
                 task.status === 'in-progress' && 'bg-blue-50',
                 task.status === 'completed' && 'bg-green-50'
               )}>
-                <StatusIcon className={cn('h-4 w-4', config.iconColor)} />
+                <StatusIcon className={cn('h-3.5 w-3.5', config.iconColor)} />
               </div>
             </div>
 
@@ -68,19 +68,19 @@ export function ChecklistCard({ task, index }: ChecklistCardProps) {
             <div className="flex-1 min-w-0">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  <h3 className="text-base font-semibold text-gray-900 mb-1.5">
                     {task.title}
                   </h3>
-                  <div className="flex items-center gap-2 mb-2 flex-wrap">
+                  <div className="flex items-center gap-2 mb-1.5 flex-wrap">
                     {task.timeEstimate && (
-                      <span className="inline-flex items-center px-2.5 py-1 rounded-md text-sm font-medium bg-gray-100 text-gray-700">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-gray-100 text-gray-700">
                         {task.timeEstimate}
                       </span>
                     )}
                     {task.badgeText && (
                       <span
                         className={cn(
-                          'inline-flex items-center px-2.5 py-1 rounded-md text-sm font-medium',
+                          'inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium',
                           task.required
                             ? 'bg-red-50 text-red-700 border border-red-200'
                             : 'bg-blue-50 text-blue-700 border border-blue-200'

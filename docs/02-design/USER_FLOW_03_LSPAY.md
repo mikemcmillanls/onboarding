@@ -77,7 +77,7 @@ This flow uses multiple verification providers at different stages:
 
 This document focuses on the **identity verification** portion of the merchant onboarding journey. For complete end-to-end flow, see:
 - [User Flow 1: Signup](./USER_FLOW_01_SIGNUP_AND_PROVISIONING.md) - Before this flow
-- [User Flow 2: Dashboard](./USER_FLOW_02_DASHBOARD.md) - Parallel to this flow (all 6 tasks)
+- [User Flow 2: Dashboard](./USER_FLOW_02_DASHBOARD.md) - Parallel to this flow (all 5 tasks)
 - [User Flow 4: Purchase](./USER_FLOW_04_PURCHASE.md) - After this flow
 
 ```
@@ -85,7 +85,7 @@ This document focuses on the **identity verification** portion of the merchant o
 │ PREREQUISITE: Signup Complete (see USER_FLOW_01)           │
 ├─────────────────────────────────────────────────────────────┤
 │ • Merchant lands on dashboard                               │
-│ • Sees 6 tasks (verification is Tasks 1-2)                  │
+│ • Sees 5 tasks (verification is Task 1)                     │
 │ • NO STRIPE ACCOUNT CREATED YET                             │
 └─────────────────────────────────────────────────────────────┘
                            ↓
@@ -123,7 +123,17 @@ This document focuses on the **identity verification** portion of the merchant o
 │ • Name, DOB, address, SSN last 4, ownership %               │
 │                                                             │
 │ → Data SAVED to YOUR database                               │
-│ → Tasks 1-2 now complete, ready to purchase                 │
+└─────────────────────────────────────────────────────────────┘
+                           ↓
+┌─────────────────────────────────────────────────────────────┐
+│ STEP 8: Connect Bank for Payouts (Optional)                │
+├─────────────────────────────────────────────────────────────┤
+│ • Optional final step in verification flow                  │
+│ • Add bank account to receive payouts from transactions     │
+│ • Account + routing number OR Plaid instant verification    │
+│                                                             │
+│ → Data SAVED to YOUR database (encrypted)                   │
+│ → Task 1 (Verify Identity) now complete, ready to purchase  │
 └─────────────────────────────────────────────────────────────┘
                            ↓
 ┌─────────────────────────────────────────────────────────────┐
@@ -191,8 +201,8 @@ This document focuses on the **identity verification** portion of the merchant o
 | Field | Pre-filled? | User Action | Why Required |
 |-------|-------------|-------------|--------------|
 | **Personal Information** |
-| First Name | No | Enter | Federal KYC requirement (Bank Secrecy Act) |
-| Last Name | No | Enter | Federal KYC requirement |
+| First Name | Yes (from signup) | Confirm/Edit | Federal KYC requirement (Bank Secrecy Act) |
+| Last Name | Yes (from signup) | Confirm/Edit | Federal KYC requirement |
 | Email | Yes (from signup) | Confirm/Edit | Contact for verification issues |
 | Your Personal Phone | Yes (from business phone) | Confirm/Edit | Your personal contact number for verification issues (pre-filled with business phone for convenience) |
 | Date of Birth | No | Enter (MM/DD/YYYY) | Age verification (18+) and identity check |
@@ -249,6 +259,8 @@ This data is required by Stripe and must be submitted when creating the Stripe a
 3. **Task Status**: Changes from "Not Started" → "Completed"
 4. **Next Step**: Merchant can proceed to Task #2 (Business Entity Information)
 5. **No Verification Yet**: Trulioo identity verification runs AFTER purchase, not now
+
+**Pre-fill Note**: First name and last name are collected during signup (Page 1 of `/get-started`) and automatically pre-filled in this verification step to reduce data entry.
 
 **Backend Note - Representative Relationship Mapping**:
 When Stripe account is created during purchase, the Title/Role selection must be mapped to Stripe's relationship flags:
@@ -415,9 +427,145 @@ Does anyone else own 25% or more of this business?
 
 1. **Data Saved**: All co-owner information stored securely
 2. **Ownership Validated**: System checks that percentages are valid
-3. **Task Complete**: Task #2 status changes to "Completed"
-4. **Ready to Purchase**: "Complete Purchase" button unlocks
-5. **No Verification Yet**: Owner verification runs AFTER purchase via Trulioo
+3. **Next Step**: Merchant proceeds to Step 8 (Connect Bank for Payouts - Optional)
+4. **No Verification Yet**: Owner verification runs AFTER purchase via Trulioo
+
+---
+
+### Step 8: Connect Bank for Payouts (Optional Final Step)
+
+**Estimated Time**: 1-3 minutes
+
+**When Shown**: After completing all required verification steps (Steps 1-7)
+
+**Why Optional**: Merchants can accept payments WITHOUT a bank account. Funds accumulate in Stripe balance until bank account is added. However, adding a bank account enables automatic payouts.
+
+---
+
+#### What Merchant Sees
+
+**Form Title**: "Connect Your Bank Account (Optional)"
+
+**Instructions**: "You're almost done! Connect your bank account to receive automatic payouts from your sales. You can skip this step and add it later - you'll still be able to accept payments."
+
+**Two Options**:
+1. **Instant Verification with Plaid** (Recommended): Connect bank securely in seconds
+2. **Manual Entry**: Enter account and routing numbers (requires micro-deposit verification)
+
+**Skip Option**: "I'll add this later" button to complete verification without bank account
+
+---
+
+#### Option 1: Instant Verification with Plaid
+
+**What Merchant Sees**:
+- "Connect Your Bank Instantly" button
+- Logos of major banks (Chase, Bank of America, Wells Fargo, etc.)
+- "Secure connection powered by Plaid" trust badge
+
+**Flow**:
+1. Merchant clicks "Connect Your Bank Instantly"
+2. Plaid modal opens
+3. Merchant selects their bank
+4. Logs in with online banking credentials
+5. Selects checking account
+6. Plaid verifies ownership instantly
+7. Success: "Bank account connected! Payouts will be sent automatically."
+
+**Advantages**:
+- ✓ Instant verification (no waiting)
+- ✓ No manual data entry
+- ✓ Payouts enabled immediately after payment processing activates
+- ✓ More secure (no routing numbers stored)
+
+---
+
+#### Option 2: Manual Bank Account Entry
+
+**What Merchant Sees**: Form with fields for bank details
+
+**Data Collected**:
+
+| Field | Pre-filled? | User Action | Why Required |
+|-------|-------------|-------------|--------------|
+| Account Holder Name | Yes (from business name) | Confirm/Edit | Must match bank account |
+| Bank Name | No | Enter | For merchant reference |
+| Account Type | No | Select: Checking or Savings | Required for ACH transfers |
+| Routing Number | No | Enter (9 digits) | Identifies the bank |
+| Account Number | No | Enter | Identifies the account |
+| Confirm Account Number | No | Re-enter | Prevents typos |
+
+**Validation Rules**:
+- **Routing Number**: Exactly 9 digits, valid US routing number
+- **Account Number**: 4-17 digits (varies by bank)
+- **Account Numbers Must Match**: Confirmation field must match
+- **Account Holder Name**: Must be business legal name or DBA
+
+**What Happens After Submission**:
+1. **Data Saved**: Bank account details stored securely (encrypted)
+2. **Micro-Deposits**: Stripe sends 2 small deposits ($0.01-$0.99) to verify account (1-2 business days)
+3. **Email Sent**: "Verify your bank account to enable payouts"
+4. **Verification Required**: Merchant must confirm deposit amounts to activate payouts
+5. **Payouts Pending**: Payouts won't flow until merchant confirms micro-deposits
+
+**Disadvantages**:
+- ✗ 1-2 day wait for micro-deposits
+- ✗ Extra step to verify deposit amounts
+- ✗ Payouts delayed until verification completes
+
+---
+
+#### What Happens If Merchant Skips
+
+**Option to Skip**:
+- "I'll add this later" button clearly visible
+- No pressure to complete (fully optional)
+
+**What Happens**:
+1. **Verification Complete**: Task #1 (Verify Your Identity) marked as "Completed"
+2. **Ready to Purchase**: Merchant can proceed to purchase flow
+3. **Payment Processing Works**: Can accept payments once verification completes
+4. **Payouts Held**: Funds accumulate in Stripe balance until bank account added
+5. **Reminder Later**: Dashboard shows "Add bank account to receive payouts" banner after payment processing activates
+
+**When Merchant Can Add Bank Later**:
+- From dashboard after purchase
+- After payment processing is active
+- Anytime before first payout
+- Via Settings → Payment Settings
+
+---
+
+#### Security & Trust Messaging
+
+**Trust Badges Shown**:
+- "Bank-level encryption (256-bit SSL)"
+- "Plaid: Trusted by 8,000+ financial apps"
+- "Your bank credentials are never shared with Lightspeed"
+- "Stripe: Certified PCI Level 1 Service Provider"
+
+**Privacy Notice**:
+```
+🔒 Your banking information is encrypted and securely stored. We use Stripe and Plaid,
+industry-leading providers trusted by millions of businesses worldwide.
+```
+
+---
+
+#### What Happens After Bank Account Added
+
+**With Plaid (Instant)**:
+1. **Verification Complete**: Immediate
+2. **Ready for Payouts**: As soon as payment processing activates
+3. **Task Complete**: "Verify Your Identity" marked as "Completed"
+4. **Payout Schedule**: Automatic daily payouts (after payment processing active)
+
+**With Manual Entry (Micro-Deposits)**:
+1. **Pending Verification**: Awaiting micro-deposit confirmation
+2. **Email Reminder**: Sent when deposits arrive (1-2 days)
+3. **Merchant Confirms**: Enters deposit amounts in dashboard
+4. **Verification Complete**: Payouts enabled
+5. **Payout Schedule**: Automatic daily payouts begin
 
 ---
 
@@ -485,7 +633,7 @@ Merchants can track verification status in their dashboard. See [User Flow 4: Po
 4. Hardware ships to configured locations
 5. Merchant can immediately accept payments when hardware arrives
 
-**Note**: Merchants can accept payments WITHOUT a bank account. Funds accumulate safely in Stripe balance until they add bank account details. See [User Flow 2: Task 3 - Bank Account](./USER_FLOW_02_DASHBOARD.md#task-3-connect-bank-for-payouts) for details.
+**Note**: Merchants can accept payments WITHOUT a bank account. Funds accumulate safely in Stripe balance until they add bank account details. Bank account connection is now part of the verification flow (Step 8 - optional).
 
 ---
 
@@ -583,9 +731,8 @@ If verification fails or requires additional information, merchants see clear gu
 - [User Flow 4: Subscription and Hardware Purchase](./USER_FLOW_04_PURCHASE.md) - Purchase flow after verification data is collected
 
 **Related Dashboard Tasks**:
-- [Task 1: Verify Your Identity](./USER_FLOW_02_DASHBOARD.md#1-verify-your-identity) - Dashboard entry point for this verification flow
+- [Task 1: Verify Your Identity](./USER_FLOW_02_DASHBOARD.md#1-verify-your-identity) - Dashboard entry point for this verification flow (includes Step 8 bank account connection)
 - [Task 2: Configure Your POS](./USER_FLOW_02_DASHBOARD.md#2-configure-your-pos) - Required before purchase
-- [Task 3: Connect Bank for Payouts](./USER_FLOW_02_DASHBOARD.md#3-connect-bank-for-payouts) - Optional, for receiving payouts
 
 **Technical Integration References**:
 - [Stripe Payment Setup Flow](../05-integrations/STRIPE_PAYMENT_SETUP_FLOW.md) - Complete Stripe Connect Custom account implementation

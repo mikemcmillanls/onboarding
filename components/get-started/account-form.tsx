@@ -11,6 +11,8 @@ import { cn } from '@/lib/utils';
 import Link from 'next/link';
 
 export interface AccountFormData {
+  firstName: string;
+  lastName: string;
   businessName: string;
   email: string;
   password: string;
@@ -23,6 +25,8 @@ interface AccountFormProps {
 
 export function AccountForm({ onNext, initialData }: AccountFormProps) {
   const [formData, setFormData] = useState<AccountFormData>({
+    firstName: initialData?.firstName || '',
+    lastName: initialData?.lastName || '',
     businessName: initialData?.businessName || '',
     email: initialData?.email || '',
     password: initialData?.password || '',
@@ -55,6 +59,20 @@ export function AccountForm({ onNext, initialData }: AccountFormProps) {
     const newErrors: Record<string, string> = { ...errors };
 
     switch (field) {
+      case 'firstName':
+        if (!formData.firstName.trim()) {
+          newErrors.firstName = 'First name is required';
+        } else {
+          delete newErrors.firstName;
+        }
+        break;
+      case 'lastName':
+        if (!formData.lastName.trim()) {
+          newErrors.lastName = 'Last name is required';
+        } else {
+          delete newErrors.lastName;
+        }
+        break;
       case 'businessName':
         if (!formData.businessName.trim()) {
           newErrors.businessName = 'Business name is required';
@@ -89,6 +107,14 @@ export function AccountForm({ onNext, initialData }: AccountFormProps) {
   const validateAll = () => {
     const newErrors: Record<string, string> = {};
 
+    if (!formData.firstName.trim()) {
+      newErrors.firstName = 'First name is required';
+    }
+
+    if (!formData.lastName.trim()) {
+      newErrors.lastName = 'Last name is required';
+    }
+
     if (!formData.businessName.trim()) {
       newErrors.businessName = 'Business name is required';
     }
@@ -111,6 +137,8 @@ export function AccountForm({ onNext, initialData }: AccountFormProps) {
 
     setErrors(newErrors);
     setTouched({
+      firstName: true,
+      lastName: true,
       businessName: true,
       email: true,
       password: true,
@@ -147,6 +175,64 @@ export function AccountForm({ onNext, initialData }: AccountFormProps) {
 
       {/* Form Section */}
       <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Name Fields - Grid Layout */}
+        <div className="grid grid-cols-2 gap-4">
+          {/* First Name Field */}
+          <div className="space-y-1.5">
+            <Label htmlFor="firstName" className="text-sm font-medium text-gray-700">
+              First Name
+            </Label>
+            <Input
+              id="firstName"
+              value={formData.firstName}
+              onChange={(e) => updateField('firstName', e.target.value)}
+              onBlur={() => handleBlur('firstName')}
+              className={cn(
+                'h-11 text-base border-gray-300 rounded-md',
+                touched.firstName && errors.firstName && 'border-red-500 focus-visible:ring-red-500'
+              )}
+              placeholder="John"
+              autoFocus
+            />
+            {touched.firstName && errors.firstName && (
+              <motion.p
+                initial={{ opacity: 0, y: -5 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-sm text-red-600"
+              >
+                {errors.firstName}
+              </motion.p>
+            )}
+          </div>
+
+          {/* Last Name Field */}
+          <div className="space-y-1.5">
+            <Label htmlFor="lastName" className="text-sm font-medium text-gray-700">
+              Last Name
+            </Label>
+            <Input
+              id="lastName"
+              value={formData.lastName}
+              onChange={(e) => updateField('lastName', e.target.value)}
+              onBlur={() => handleBlur('lastName')}
+              className={cn(
+                'h-11 text-base border-gray-300 rounded-md',
+                touched.lastName && errors.lastName && 'border-red-500 focus-visible:ring-red-500'
+              )}
+              placeholder="Doe"
+            />
+            {touched.lastName && errors.lastName && (
+              <motion.p
+                initial={{ opacity: 0, y: -5 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-sm text-red-600"
+              >
+                {errors.lastName}
+              </motion.p>
+            )}
+          </div>
+        </div>
+
         {/* Business Name Field */}
         <div className="space-y-1.5">
           <Label htmlFor="businessName" className="text-sm font-medium text-gray-700">
@@ -162,7 +248,6 @@ export function AccountForm({ onNext, initialData }: AccountFormProps) {
               touched.businessName && errors.businessName && 'border-red-500 focus-visible:ring-red-500'
             )}
             placeholder="e.g., Riverside Coffee Co."
-            autoFocus
           />
           {touched.businessName && errors.businessName && (
             <motion.p

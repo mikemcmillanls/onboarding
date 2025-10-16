@@ -15,8 +15,8 @@ import { Loader2 } from 'lucide-react';
 const getDefaultChecklistTasks = (): ChecklistTask[] => [
   {
     id: 'individual-verification',
-    title: 'Verify Your Identity',
-    description: 'Complete identity verification for you and any business owners. Required to activate payment processing after purchase.',
+    title: 'Get Approved to Accept Payments',
+    description: 'Confirm a few details about yourself and your business to start accepting payments.',
     status: 'not-started',
     required: true,
     route: '/dashboard/verify',
@@ -32,16 +32,6 @@ const getDefaultChecklistTasks = (): ChecklistTask[] => [
     route: '/dashboard/pos-setup',
     timeEstimate: '2-3 min',
     badgeText: 'Required to accept payments',
-  },
-  {
-    id: 'bank-account-payouts',
-    title: 'Connect Bank for Payouts',
-    description: 'You can accept payments without this. Add your bank account to receive payouts from transactions.',
-    status: 'not-started',
-    required: false,
-    route: '/dashboard/payments',
-    timeEstimate: '1-3 min',
-    badgeText: 'Optional - add anytime',
   },
   {
     id: 'hardware-selection',
@@ -93,17 +83,18 @@ function calculateTaskStatus(merchant: StoredMerchant): ChecklistTask[] {
     tasks[1].status = 'in-progress';
   }
 
-  // Bank Account (Payouts) - index 2
-  if (merchant.bankAccountData?.accountNumber && merchant.bankAccountData?.routingNumber) {
+  // Hardware Selection - index 2
+  if (merchant.checkoutData?.paymentMethod || merchant.posSetupData?.existingHardware?.hasExisting) {
     tasks[2].status = 'completed';
-  } else if (merchant.bankAccountData) {
+  } else if (merchant.checkoutData) {
     tasks[2].status = 'in-progress';
   }
 
-  // Hardware Selection - index 3
-  if (merchant.checkoutData?.paymentMethod || merchant.posSetupData?.existingHardware?.hasExisting) {
+  // Data Import - index 3
+  const importTask = merchant.setupTasks?.find(t => t.id.includes('import') || t.id.includes('data'));
+  if (importTask?.completed) {
     tasks[3].status = 'completed';
-  } else if (merchant.checkoutData) {
+  } else if (importTask) {
     tasks[3].status = 'in-progress';
   }
 
@@ -113,14 +104,6 @@ function calculateTaskStatus(merchant: StoredMerchant): ChecklistTask[] {
     tasks[4].status = 'completed';
   } else if (teamTask) {
     tasks[4].status = 'in-progress';
-  }
-
-  // Import Data - index 5
-  const importTask = merchant.setupTasks?.find(t => t.id.includes('import') || t.id.includes('data'));
-  if (importTask?.completed) {
-    tasks[5].status = 'completed';
-  } else if (importTask) {
-    tasks[5].status = 'in-progress';
   }
 
   return tasks;
@@ -244,7 +227,7 @@ export default function DashboardPage() {
       <main className="lg:ml-[185px] min-h-screen pt-14 bg-[#FAFAFA]">
         <div className="max-w-6xl mx-auto px-6 py-8 md:px-8 md:py-10 lg:px-12 lg:py-12">
           {/* Hero Section */}
-          <div className="mb-10">
+          <div className="mb-6">
             <HeroSection
               businessName={businessName}
               completed={completedTasks}
@@ -258,15 +241,15 @@ export default function DashboardPage() {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
           >
-            <div className="mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">Setup Checklist</h2>
-              <p className="text-gray-600 mt-1">
+            <div className="mb-5">
+              <h2 className="text-xl font-bold text-gray-900">Setup Checklist</h2>
+              <p className="text-sm text-gray-600 mt-1">
                 Complete these tasks to get your business up and running
               </p>
             </div>
 
             {/* Checklist Cards */}
-            <div className="space-y-4">
+            <div className="space-y-3">
               {checklistTasks.map((task, index) => (
                 <ChecklistCard key={task.id} task={task} index={index} />
               ))}
@@ -278,30 +261,30 @@ export default function DashboardPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
-            className="mt-12 p-6 bg-blue-50 border border-blue-200 rounded-lg"
+            className="mt-12 p-6 bg-white border border-gray-200 rounded-xl shadow-sm"
           >
-            <h3 className="text-lg font-semibold text-blue-900 mb-2">
+            <h3 className="text-lg font-semibold text-gray-900 mb-1">
               Need Help?
             </h3>
-            <p className="text-blue-800 mb-4">
+            <p className="text-sm text-gray-600 mb-4">
               Our support team is here to help you get set up. Contact us anytime!
             </p>
-            <div className="flex flex-wrap gap-4">
+            <div className="flex flex-wrap gap-3">
               <a
                 href="tel:+15551234567"
-                className="text-blue-700 hover:text-blue-900 font-medium underline"
+                className="inline-flex items-center px-4 py-2 bg-gray-50 hover:bg-gray-100 text-sm text-gray-900 font-medium rounded-lg border border-gray-200 transition-colors"
               >
                 Call (555) 123-4567
               </a>
               <a
                 href="mailto:support@lightspeed.com"
-                className="text-blue-700 hover:text-blue-900 font-medium underline"
+                className="inline-flex items-center px-4 py-2 bg-gray-50 hover:bg-gray-100 text-sm text-gray-900 font-medium rounded-lg border border-gray-200 transition-colors"
               >
                 Email Support
               </a>
               <a
                 href="#"
-                className="text-blue-700 hover:text-blue-900 font-medium underline"
+                className="inline-flex items-center px-4 py-2 bg-gray-50 hover:bg-gray-100 text-sm text-gray-900 font-medium rounded-lg border border-gray-200 transition-colors"
               >
                 Live Chat
               </a>

@@ -55,14 +55,12 @@ export default function GetStartedPage() {
       <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-black rounded flex items-center justify-center">
-                <span className="text-white font-bold text-xl">L</span>
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-black">Lightspeed</h1>
-                <p className="text-xs text-gray-600">POS & Payments</p>
-              </div>
+            <div className="flex items-center">
+              <img
+                src="/lightspeed-logo-dark.svg"
+                alt="Lightspeed"
+                className="h-6"
+              />
             </div>
           </div>
         </div>

@@ -39,9 +39,9 @@ This document describes the dashboard experience after merchant completes signup
 
 **Header Section**:
 - Welcome message: "Welcome back, [Business Name]!"
-- Overall progress indicator (e.g., "2 of 6 tasks completed")
+- Overall progress indicator (e.g., "2 of 5 tasks completed")
 
-**6 Task Cards** (grid layout):
+**5 Task Cards** (grid layout):
 - Each card displays:
   - Task icon with status indicator
   - Task title and description
@@ -51,8 +51,10 @@ This document describes the dashboard experience after merchant completes signup
 
 **Visual Hierarchy**:
 - Critical tasks (1-2) emphasized with priority badges
-- Optional tasks (3-6) shown with lower visual priority
+- Optional tasks (3-5) shown with lower visual priority
 - Clear path: Identity → POS → Purchase
+
+**Note**: Bank account connection for payouts has been moved from a separate dashboard task to an optional final step within the identity verification flow.
 
 **Cohort-Specific Dashboard Elements**:
 - **Self-Serve**: Standard dashboard, no specialist banners
@@ -154,7 +156,7 @@ Each cohort sees a different dashboard experience with varying levels of support
 
 ---
 
-## The 6 Dashboard Tasks
+## The 5 Dashboard Tasks
 
 ### Critical Tasks (Required for Payment Processing)
 
@@ -162,7 +164,7 @@ Each cohort sees a different dashboard experience with varying levels of support
 
 **Priority**: ⭐ Required to accept payments
 **Time**: 10-15 minutes
-**Route**: `/dashboard/tasks/verify-identity`
+**Route**: `/dashboard/verify`
 
 **Purpose**: Collect KYC/KYB data required by Stripe for payment processing compliance.
 
@@ -171,8 +173,9 @@ Each cohort sees a different dashboard experience with varying levels of support
 - Business entity details (EIN, legal structure)
 - Beneficial owners (if 25%+ ownership exists)
 - Stripe Terms of Service acceptance
+- **NEW**: Optional bank account connection for payouts (final step in verification flow)
 
-**Note**: Business data was enhanced at signup via TrueBiz (data enrichment only). This task collects official KYC/KYB data verified by Trulioo.
+**Note**: Business data was enhanced at signup via TrueBiz (data enrichment only). This task collects official KYC/KYB data verified by Trulioo. Bank account connection is now included as an optional final step within this verification flow.
 
 **See**: [User Flow 3: Identity Verification](./USER_FLOW_03_LSPAY.md) for complete data requirements and UI flow.
 
@@ -202,30 +205,7 @@ Each cohort sees a different dashboard experience with varying levels of support
 
 ### Optional Tasks (Can Be Completed Anytime)
 
-#### 3. Connect Bank for Payouts
-
-**Priority**: ⚠️ Optional - add anytime
-**Time**: 1-3 minutes (instant with Plaid)
-**Route**: `/dashboard/tasks/bank-account`
-
-**Purpose**: Connect bank account to receive payouts from sales.
-
-**Critical Note**: Merchants can accept payments WITHOUT a bank account. Funds accumulate in Stripe balance until bank is connected.
-
-**Connection Methods**:
-- **Plaid** (instant verification, 1-2 minutes)
-- **Manual entry** (micro-deposit verification, 1-2 days)
-
-**What's Collected**:
-- Bank routing and account numbers
-- Account holder name (must match business/representative)
-- Account type (checking/savings)
-
-**Payout Schedule**: Daily automatic payouts with 2-day rolling window (e.g., Monday sales → Wednesday payout)
-
-**Task Completion**: External bank account created in Stripe, ready for payouts.
-
-#### 4. Hardware Selection
+#### 3. Hardware Selection
 
 **Priority**: Optional
 **Time**: 5-10 minutes
@@ -249,7 +229,7 @@ Each cohort sees a different dashboard experience with varying levels of support
 
 **See**: [User Flow 4: Hardware Selection](./USER_FLOW_04_PURCHASE.md#hardware-bundle-selection) for complete catalog and pricing.
 
-#### 5. Data Import
+#### 4. Data Import
 
 **Priority**: Optional
 **Time**: 10-30 minutes
@@ -269,7 +249,7 @@ Each cohort sees a different dashboard experience with varying levels of support
 
 **Task Completion**: Imported data immediately available in X-Series POS. Can also start fresh and add products manually.
 
-#### 6. Team Setup
+#### 5. Team Setup
 
 **Priority**: Optional
 **Time**: 3-5 minutes per team member
@@ -348,9 +328,8 @@ Verification processing begins (1-2 days)
 ### What Happens in Background
 
 **During Dashboard Tasks**:
-- Task 1 (Verify Identity): Data saved to YOUR database (encrypted)
+- Task 1 (Verify Identity): Data saved to YOUR database (encrypted), includes optional bank account connection
 - Task 2 (Configure POS): Data saved to YOUR database
-- Task 3 (Bank Account): Data saved to YOUR database (encrypted)
 - NO Stripe API calls yet - just storing data locally
 
 **During Purchase**:
@@ -403,11 +382,9 @@ NO Stripe account created yet
 Merchant completes Task 1: Verify Your Identity (10-15 min)
   → Data SAVED to YOUR database (encrypted)
   → ToS acceptance captured (date, IP, user agent)
+  → Optional: Bank account for payouts (if connected)
   ↓
 Merchant completes Task 2: Configure Your POS (2-3 min)
-  → Data SAVED to YOUR database
-  ↓
-Merchant optionally completes Task 3: Connect Bank for Payouts (1-3 min)
   → Data SAVED to YOUR database
   ↓
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
