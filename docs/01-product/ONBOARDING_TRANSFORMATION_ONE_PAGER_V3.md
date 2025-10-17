@@ -115,24 +115,39 @@ Cancel (wasted sales time + IC capacity)
 ```
 Problem 1: Sales Owns Front Door
     ↓
+    No free trial option (goes directly to Salesforce MQL)
+    ↓
+    Merchants can't "try before they buy"
+    ↓
+    Sales forced to qualify/convert merchants who aren't ready
+    +
     Can't collect comprehensive data at signup
     ↓
 Problem 2: Fragmented Data Systems
     ↓
-    Forces merchants to re-enter info multiple times
+    AE manually captures data during sales call
     ↓
-    19.2% abandon LSPay application
+    Merchant must re-enter same info in LSPay, Hardware, X-Series
+    ↓
+    19.2% abandon LSPay application due to form fatigue
     +
 Problem 3: Split Billing
     ↓
+    Software and hardware quoted/billed separately
+    ↓
     Hardware feels like "hidden cost"
     ↓
-    AEs don't sell hardware properly
+    AEs don't sell hardware properly (no commission)
     ↓
-    Downstream setup issues
+    Downstream setup issues, support burden
 
 = 86.5% ABANDONMENT
 ```
+
+**The critical insight**: Because Sales owns the front door, there's no free trial option. Merchants go directly into Salesforce as MQLs, forcing immediate sales engagement. This prevents:
+- Product team from collecting comprehensive data at signup (causes Problem 2)
+- Merchants from self-qualifying through trial usage
+- Any cohort segmentation based on actual product fit
 
 **You can't fix one without fixing all three.**
 
@@ -508,78 +523,6 @@ Confirmation: Software activated + Hardware ships in 3 days
 
 ---
 
-## Financial Impact: All Three Pillars
-
-### Pillar 1: Product-Owned Front Door (Self-Serve Cost Savings)
-
-**Current State Costs** (Per 100 Self-Serve Leads):
-- Sales/IC labor: 300 hours @ ~$75/hr = **$22.5K**
-- Free terminals given: ~20 conversions × $200 = **$4K**
-- Terminal waste (70% churn): ~14 wasted terminals = **$2.8K**
-- Sales commissions: **~$200-500** (low value deals)
-- **Total cost per 100 leads: $27K-$30K**
-
-**New State Economics** (Per 100 Self-Serve Leads):
-- Sales/IC labor: **$0** (self-serve)
-- Terminal strategy: **$0-$6K** depending on policy (earn-it vs. free models)
-- Sales commissions: **$0** (no sales touch)
-- **Total cost per 100 leads: $0-$6K**
-
-**Net Savings**:
-- **$21K-$27K per 100 leads**
-- At 400 Self-Serve leads/month = **$1.0M-$1.3M annual savings**
-
----
-
-### Pillar 2: Unified Data Flow (LSPay Conversion Improvement)
-
-**Current State**:
-- LSPay eligibility → application: 19.2% drop-off (Code Yellow data)
-- Root cause: Form fatigue from re-entering same data
-- Lost merchants: ~250/year abandon LSPay application
-
-**New State**:
-- Pre-filled LSPay application reduces drop-off from 19.2% to <10%
-- Net gain: ~150 additional LSPay approvals per year
-
-**Revenue Impact**:
-- 150 merchants/year × $10K avg LTV = **$1.5M additional annual revenue**
-- **Applies to ALL cohorts** (Self-Serve, Assisted, Managed)
-
----
-
-### Pillar 3: Unified Purchase (Hardware Attachment + AE Productivity)
-
-**Hardware Attachment Rate**:
-- Current: ~60% attach hardware
-- New: 85%+ (AEs incentivized, clearer pricing)
-- Net gain: 25% increase × 1,300 merchants/year × $400 avg hardware = **$130K/year**
-
-**Support Cost Savings**:
-- Reduce third-party hardware issues by 70%
-- 500 tickets/year × 70% × $50/ticket = **$17.5K/year**
-
-**AE Productivity**:
-- Less time on billing confusion and hardware troubleshooting
-- ~100 hours/year saved across sales team
-
-**Total Pillar 3 Impact**: **$150K-$200K/year**
-
----
-
-### Combined Annual Impact
-
-| Pillar | Annual Impact | Applies To |
-|--------|---------------|------------|
-| **Pillar 1**: Product-Owned Front Door | **$1.0M-$1.3M** (cost savings) | Self-Serve only |
-| **Pillar 2**: Unified Data Flow | **$1.5M** (revenue) | ALL cohorts |
-| **Pillar 3**: Unified Purchase | **$150K-$200K** (revenue + savings) | ALL cohorts |
-| **TOTAL** | **$2.65M-$3.0M** | - |
-
-**Plus scale opportunity**: Can 10x Self-Serve volume without proportional cost increase
-
----
-
 ## Implementation Sequence
 
 ### Phase 0: Strategic Alignment (REQUIRED FIRST)
@@ -882,7 +825,6 @@ This is a **fundamental transformation in how merchants experience onboarding**:
   - LSPay completion (target: 85%+)
   - Hardware attachment (target: 80%+)
 - If successful → scale to all cohorts
-- **Combined impact: $2.65M-$3.0M annually**
 
 **This isn't just an onboarding improvement. This is a transformation in how we acquire, activate, and scale merchants.**
 
@@ -891,7 +833,7 @@ This is a **fundamental transformation in how merchants experience onboarding**:
 2. Are we willing to invest in unified systems? (Data flow + unified purchase)
 3. Are we willing to redefine success? ("Closed Won" = software + hardware + LSPay)
 
-**If the answer to all three is YES, we have a $2.65M-$3.0M annual opportunity.**
+**If the answer to all three is YES, we can transform how merchants experience onboarding.**
 
 ---
 
