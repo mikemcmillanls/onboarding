@@ -14,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { ArrowLeft, ArrowRight, Check, Shield, Scan, CheckCircle2, XCircle, Loader2 } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, Shield, Scan, CheckCircle2, XCircle, Loader2, Building2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { US_STATES, BUSINESS_CATEGORIES, BUSINESS_STRUCTURES } from '@/lib/merchant-mock-data';
 import { MerchantStorage } from '@/lib/merchant-storage';
@@ -101,6 +101,7 @@ function VerifyPageContent() {
   const [stripeIdentitySessionId, setStripeIdentitySessionId] = useState<string | null>(null);
   const [stripeIdentityStatus, setStripeIdentityStatus] = useState<'pending' | 'verified' | 'requires_input' | 'canceled' | null>(null);
   const [isLoadingStripeIdentity, setIsLoadingStripeIdentity] = useState(false);
+  const [bankConnectionMethod, setBankConnectionMethod] = useState<'skip' | 'plaid' | 'manual' | null>(null);
   const [formData, setFormData] = useState<VerificationFormData>({
     // Individual KYC
     firstName: '',
@@ -155,6 +156,16 @@ function VerifyPageContent() {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [currentStep]);
+
+  // Update bank account holder name when legal business name changes
+  useEffect(() => {
+    if (formData.legalBusinessName && !formData.bankAccountHolderName) {
+      setFormData(prev => ({
+        ...prev,
+        bankAccountHolderName: formData.legalBusinessName,
+      }));
+    }
+  }, [formData.legalBusinessName]);
 
   const loadMerchantData = async () => {
     try {
@@ -369,12 +380,6 @@ function VerifyPageContent() {
         newErrors.email = 'Invalid email address';
       }
       if (!formData.phone.trim()) newErrors.phone = 'Phone number is required';
-      if (!formData.dateOfBirth) {
-        newErrors.dateOfBirth = 'Date of birth is required';
-      } else {
-        const age = new Date().getFullYear() - new Date(formData.dateOfBirth).getFullYear();
-        if (age < 18) newErrors.dateOfBirth = 'You must be 18 or older';
-      }
     }
 
     // Step 2: Home Address & SSN
@@ -392,15 +397,19 @@ function VerifyPageContent() {
       } else if (!/^\d{4}$/.test(formData.ssnLast4)) {
         newErrors.ssnLast4 = 'Must be 4 digits';
       }
+      // Date of birth is optional, but if provided, validate age
+      if (formData.dateOfBirth) {
+        const age = new Date().getFullYear() - new Date(formData.dateOfBirth).getFullYear();
+        if (age < 18) newErrors.dateOfBirth = 'You must be 18 or older';
+      }
     }
 
-    // Step 3: Role in Business + ToS
+    // Step 3: Role in Business
     if (step === 3) {
       if (!formData.title) newErrors.title = 'Role is required';
       if ((formData.title === 'owner' || formData.title === 'partner') && !formData.ownershipPercentage) {
         newErrors.ownershipPercentage = 'Ownership percentage is required';
       }
-      if (!formData.tosAccepted) newErrors.tosAccepted = 'You must accept the terms';
     }
 
     // Step 4: Business Entity Information (KYB)
@@ -448,8 +457,8 @@ function VerifyPageContent() {
 
     // Step 6: Final Review (no additional validation needed)
 
-    // Step 7: Bank Account (optional - validation only if not skipped)
-    if (step === 7 && !formData.skipBankAccount) {
+    // Step 7: Bank Account (optional - validation only for manual entry)
+    if (step === 7 && bankConnectionMethod === 'manual') {
       if (!formData.bankAccountHolderName.trim()) newErrors.bankAccountHolderName = 'Account holder name is required';
       if (!formData.accountType) newErrors.accountType = 'Account type is required';
 
@@ -609,12 +618,6 @@ function VerifyPageContent() {
                   <Input id="phone" type="tel" value={formData.phone} onChange={(e) => updateField('phone', e.target.value)} placeholder="(555) 123-4567" className={cn(errors.phone && 'border-red-500')} />
                   <p className="text-xs text-gray-500">Your personal contact number for verification issues (pre-filled with business phone for convenience)</p>
                   {errors.phone && <p className="text-sm text-red-600">{errors.phone}</p>}
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="dateOfBirth">Date of Birth *</Label>
-                  <Input id="dateOfBirth" type="date" value={formData.dateOfBirth} onChange={(e) => updateField('dateOfBirth', e.target.value)} className={cn(errors.dateOfBirth && 'border-red-500')} />
-                  <p className="text-xs text-gray-500">You must be 18 or older</p>
-                  {errors.dateOfBirth && <p className="text-sm text-red-600">{errors.dateOfBirth}</p>}
                 </div>
               </div>
             </motion.div>
@@ -777,6 +780,19 @@ function VerifyPageContent() {
                     <p className="text-xs text-gray-500">Used for identity verification. We&apos;ll only ask for your full SSN if automated verification fails.</p>
                     {errors.ssnLast4 && <p className="text-sm text-red-600">{errors.ssnLast4}</p>}
                   </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="dateOfBirth">Date of Birth</Label>
+                    <Input
+                      id="dateOfBirth"
+                      type="date"
+                      value={formData.dateOfBirth}
+                      onChange={(e) => updateField('dateOfBirth', e.target.value)}
+                      className={cn(errors.dateOfBirth && 'border-red-500')}
+                      disabled={isLoadingStripeIdentity}
+                    />
+                    <p className="text-xs text-gray-500">Optional - only required if automated ID verification fails</p>
+                    {errors.dateOfBirth && <p className="text-sm text-red-600">{errors.dateOfBirth}</p>}
+                  </div>
                 </div>
               </div>
             </motion.div>
@@ -809,15 +825,6 @@ function VerifyPageContent() {
                     {errors.ownershipPercentage && <p className="text-sm text-red-600">{errors.ownershipPercentage}</p>}
                   </motion.div>
                 )}
-                <div className="pt-6 border-t space-y-4">
-                  <div className="flex items-start gap-3">
-                    <Checkbox id="tosAccepted" checked={formData.tosAccepted} onCheckedChange={(checked) => updateField('tosAccepted', checked === true)} className="mt-1" />
-                    <label htmlFor="tosAccepted" className="text-sm text-gray-700 leading-relaxed cursor-pointer">
-                      I agree to Stripe&apos;s <a href="https://stripe.com/connect-account/legal" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-700 underline">Connected Account Agreement</a> and authorize Lightspeed to share my information with Stripe for payment processing.
-                    </label>
-                  </div>
-                  {errors.tosAccepted && <p className="text-sm text-red-600">{errors.tosAccepted}</p>}
-                </div>
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                   <p className="text-sm text-blue-900"><strong>Why we need this:</strong> Federal regulations require us to verify the identity of business owners and executives who can authorize payments.</p>
                 </div>
@@ -1079,12 +1086,6 @@ function VerifyPageContent() {
                     ))}
                   </div>
                 )}
-
-                <div className="bg-green-50 border border-green-200 rounded-lg p-4 mt-6">
-                  <p className="text-sm text-green-900">
-                    <strong>What happens next?</strong> We&apos;ll verify your information in the background using Trulioo. This typically takes 1-2 business days. You&apos;ll receive an email when your account is approved and payment processing is activated.
-                  </p>
-                </div>
               </div>
             </motion.div>
           )}
@@ -1231,20 +1232,93 @@ function VerifyPageContent() {
                 </div>
 
                 <div className="space-y-4">
-                  <Label className="text-base">Would you like to add your bank account now?</Label>
+                  <Label className="text-base">How would you like to connect your bank account?</Label>
                   <div className="space-y-3">
                     <div className="flex items-center space-x-3">
-                      <input type="radio" id="addBankNo" name="skipBankAccount" checked={formData.skipBankAccount} onChange={() => updateField('skipBankAccount', true)} className="w-4 h-4 text-red-600" />
-                      <label htmlFor="addBankNo" className="text-sm cursor-pointer">I&apos;ll add this later (skip)</label>
+                      <input
+                        type="radio"
+                        id="addBankSkip"
+                        name="bankConnectionMethod"
+                        checked={bankConnectionMethod === 'skip'}
+                        onChange={() => {
+                          setBankConnectionMethod('skip');
+                          updateField('skipBankAccount', true);
+                        }}
+                        className="w-4 h-4 text-red-600"
+                      />
+                      <label htmlFor="addBankSkip" className="text-sm cursor-pointer">I&apos;ll add this later (skip)</label>
                     </div>
                     <div className="flex items-center space-x-3">
-                      <input type="radio" id="addBankYes" name="skipBankAccount" checked={!formData.skipBankAccount} onChange={() => updateField('skipBankAccount', false)} className="w-4 h-4 text-red-600" />
-                      <label htmlFor="addBankYes" className="text-sm cursor-pointer">Yes, add my bank account now</label>
+                      <input
+                        type="radio"
+                        id="addBankPlaid"
+                        name="bankConnectionMethod"
+                        checked={bankConnectionMethod === 'plaid'}
+                        onChange={() => {
+                          setBankConnectionMethod('plaid');
+                          updateField('skipBankAccount', false);
+                        }}
+                        className="w-4 h-4 text-red-600"
+                      />
+                      <label htmlFor="addBankPlaid" className="text-sm cursor-pointer">Connect instantly with Plaid (recommended)</label>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <input
+                        type="radio"
+                        id="addBankManual"
+                        name="bankConnectionMethod"
+                        checked={bankConnectionMethod === 'manual'}
+                        onChange={() => {
+                          setBankConnectionMethod('manual');
+                          updateField('skipBankAccount', false);
+                        }}
+                        className="w-4 h-4 text-red-600"
+                      />
+                      <label htmlFor="addBankManual" className="text-sm cursor-pointer">Enter account details manually</label>
                     </div>
                   </div>
                 </div>
 
-                {!formData.skipBankAccount && (
+                {bankConnectionMethod === 'plaid' && (
+                  <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="space-y-6 pt-6 border-t">
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 space-y-4">
+                      <div className="flex items-start gap-3">
+                        <Building2 className="w-6 h-6 text-blue-600 flex-shrink-0" />
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-blue-900 mb-1">Connect with Plaid</h3>
+                          <p className="text-sm text-blue-700 mb-4">
+                            Instantly and securely connect your bank account using Plaid. Your credentials are never stored, and the connection is encrypted.
+                          </p>
+                          <ul className="text-sm text-blue-700 space-y-1 mb-4">
+                            <li>✓ Instant verification (no micro-deposits)</li>
+                            <li>✓ Bank-level security</li>
+                            <li>✓ Works with 10,000+ banks</li>
+                          </ul>
+                          <Button
+                            onClick={() => {
+                              // TODO: Launch Plaid integration
+                              alert('Plaid integration coming soon!');
+                            }}
+                            className="w-full bg-blue-600 hover:bg-blue-700"
+                          >
+                            <Building2 className="w-4 h-4 mr-2" />
+                            Connect with Plaid
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="relative">
+                      <div className="absolute inset-0 flex items-center">
+                        <div className="w-full border-t border-gray-200"></div>
+                      </div>
+                      <div className="relative flex justify-center text-sm">
+                        <span className="px-4 bg-white text-gray-500">Or enter manually</span>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+
+                {bankConnectionMethod === 'manual' && (
                   <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="space-y-6 pt-6 border-t">
                     <div className="space-y-2">
                       <Label htmlFor="bankAccountHolderName">Account Holder Name *</Label>
@@ -1311,12 +1385,14 @@ function VerifyPageContent() {
                   </motion.div>
                 )}
 
-                {formData.skipBankAccount && (
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                    <p className="text-sm text-blue-900">
-                      <strong>No problem!</strong> You can add your bank account later from your dashboard. You&apos;ll still be able to accept payments - funds will accumulate safely in your Stripe balance.
-                    </p>
-                  </div>
+                {bankConnectionMethod === 'skip' && (
+                  <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="pt-6 border-t">
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                      <p className="text-sm text-blue-900">
+                        <strong>No problem!</strong> You can add your bank account later from your dashboard. You&apos;ll still be able to accept payments - funds will accumulate safely in your Stripe balance.
+                      </p>
+                    </div>
+                  </motion.div>
                 )}
               </div>
             </motion.div>
