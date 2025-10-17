@@ -2,9 +2,20 @@
 
 ## The Problem
 
-**We're forcing every merchant through a sales funnel—even those who don't need sales.**
+**Merchants face unnecessary friction and delays getting started—forced to re-enter information across multiple systems, wait for sales calls they don't want, and navigate a process that doesn't fit their timeline. Result: 33 days average to first transaction and 86.5% abandonment.**
 
 Current flow: Free trial signup → Salesforce MQL → Rep qualifies → SDR sells → 70% of Ignite never transact → Cancel
+
+### What We're Hearing
+
+> "Merchants are left uncertain about ownership, eroding trust and continuity. ICs often start from scratch without context from the AE relationship."
+> — AE/IC Interview Feedback
+
+> "Merchants must re-enter the same business details across multiple LS Pay forms and portals, creating inefficiency and a poor user experience."
+> — AE/IC Interview Feedback
+
+> "AEs report an increasing volume of leads that are not a good fit for Lightspeed. These customers have low long-term value and are highly likely to churn. They often switch to competitors (e.g., Square) offering simpler onboarding or cheaper pricing."
+> — AE/IC Interview Feedback
 
 **Results**:
 - **86.5% of qualified leads lost** before reaching 10CD activation
