@@ -21,7 +21,7 @@ const getDefaultChecklistTasks = (): ChecklistTask[] => [
     required: true,
     route: '/dashboard/verify',
     timeEstimate: '10-15 min',
-    badgeText: 'Required to accept payments',
+    badgeText: 'Required',
   },
   {
     id: 'pos-configuration',
@@ -31,7 +31,6 @@ const getDefaultChecklistTasks = (): ChecklistTask[] => [
     required: true,
     route: '/dashboard/pos-setup',
     timeEstimate: '2-3 min',
-    badgeText: 'Required to accept payments',
   },
   {
     id: 'hardware-selection',
@@ -41,7 +40,6 @@ const getDefaultChecklistTasks = (): ChecklistTask[] => [
     required: false,
     route: '/dashboard/hardware',
     timeEstimate: '5-10 min',
-    badgeText: 'Optional - can use existing',
   },
   {
     id: 'team-setup',
@@ -51,7 +49,6 @@ const getDefaultChecklistTasks = (): ChecklistTask[] => [
     required: false,
     route: '/dashboard/team',
     timeEstimate: '3-5 min',
-    badgeText: 'Optional - add anytime',
   },
   {
     id: 'import-data',
@@ -61,7 +58,6 @@ const getDefaultChecklistTasks = (): ChecklistTask[] => [
     required: false,
     route: '/dashboard/import',
     timeEstimate: '10-30 min',
-    badgeText: 'Optional - add anytime',
   },
 ];
 
